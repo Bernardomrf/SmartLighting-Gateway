@@ -11,23 +11,20 @@ import org.wso2.siddhi.core.event.Event;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
-/**
- *
- * @author bernardo
- */
+
 public class Test {
-    /*public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
 
         // Creating Siddhi Manager
         SiddhiManager siddhiManager = new SiddhiManager();
 
         String executionPlan = "" +
-                "define stream cseEventStream (symbol string, price float, volume long); " +
+                "define stream cseEventStream (symbol string, price1 float, price2 float, volume long , quantity int);" +
                 "" +
                 "@info(name = 'query1') " +
-                "from cseEventStream[volume < 150] " +
-                "select symbol,price " +
-                "insert into outputStream ;";
+                "from cseEventStream " +
+                "select symbol, coalesce(price1,price2) as price, quantity " +
+                "insert into outputStream;";
 
         //Generating runtime
         ExecutionPlanRuntime executionPlanRuntime = siddhiManager.createExecutionPlanRuntime(executionPlan);
@@ -47,12 +44,10 @@ public class Test {
         executionPlanRuntime.start();
 
         //Sending events to Siddhi
-        inputHandler.send(new Object[]{"IBM", 700f, 100l});
-        inputHandler.send(new Object[]{"WSO2", 60.5f, 200l});
-        inputHandler.send(new Object[]{"GOOG", 50f, 30l});
-        inputHandler.send(new Object[]{"IBM", 76.6f, 400l});
-        inputHandler.send(new Object[]{"WSO2", 45.6f, 50l});
-        Thread.sleep(500);
+        inputHandler.send(new Object[]{"WSO2", 50f, 60f, 60l, 6});
+        inputHandler.send(new Object[]{"WSO2", 70f, null, 40l, 10});
+        inputHandler.send(new Object[]{"WSO2", null, 44f, 200l, 56});
+        Thread.sleep(100);
 
         //Shutting down the runtime
         executionPlanRuntime.shutdown();
@@ -60,5 +55,5 @@ public class Test {
         //Shutting down Siddhi
         siddhiManager.shutdown();
 
-    }*/
+    }
 }
