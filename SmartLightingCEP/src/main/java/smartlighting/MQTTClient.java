@@ -76,14 +76,13 @@ public class MQTTClient implements MqttCallback {
             throws Exception {
         
         //System.out.println(tmp);
-        for(Object i : (ArrayList) adapters.getAdapters("receiver")){
-            if(((Pattern)i).matcher(topic).matches()){
-                System.out.println("BELONGS");
-            }
-        }
+        ((ArrayList) adapters.getAdapters("receiver")).stream().filter((i) -> (((Pattern)i).matcher(topic).matches())).forEach((_item) -> {
+            System.out.println("BELONGS");
+            System.out.println(topic);
+        });
         
         Event inEvent = new Gson().fromJson(message.toString(), Event.class);
-        System.out.println(inEvent.getEvent().getPayloadData().getDevice());
+        
         
     }
 
