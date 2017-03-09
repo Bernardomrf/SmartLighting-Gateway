@@ -19,13 +19,13 @@ import smartlighting.Resources.Adapters;
  *
  * @author bernardo
  */
-public class ExecutionPlan {
+public class ExecutionP {
     
     private String ep;
     private Map<String, Object> json;
     private Adapters redis;
     
-    public ExecutionPlan(String ep, String json){
+    public ExecutionP(String ep, String json){
         loadJson(json);
         loadEP(ep);
         
@@ -33,6 +33,10 @@ public class ExecutionPlan {
     
     private void loadEP(String ep){
         this.ep = ep;
+    }
+    
+    public String getEP(){
+        return ep;
     }
     
     private void loadJson(String json){

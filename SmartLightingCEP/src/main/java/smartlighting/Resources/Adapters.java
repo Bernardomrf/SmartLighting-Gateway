@@ -18,10 +18,11 @@ import javafx.util.Pair;
 public class Adapters {
     private static Map<String, List<Pair<Object, String>>> adapters = new HashMap<>();
     
-    public List<Object> getAdapters(String key){
-        List<Object> tmp = new ArrayList<>();
+    public List<Pair<Object, String>> getAdapters(String key){
+        List<Pair<Object, String>> tmp = new ArrayList<>();
         adapters.get(key).stream().forEach((i) -> {
-            tmp.add(i.getKey());
+            Pair<Object, String> pair = new Pair<Object, String>(i.getKey(), i.getValue());
+            tmp.add(pair);
         });
         return tmp;
     }
