@@ -36,6 +36,7 @@ public class ExecutionP {
     }
     
     public String getEP(){
+        
         return ep;
     }
     
@@ -43,24 +44,36 @@ public class ExecutionP {
         
         this.json = new Gson().fromJson(json, Map.class);
        
-        setTargets();
-        setReceivers();
+        setAdapters();
+        //setReceivers();
+        Adapters adapters = new Adapters();
+        
+        System.out.println(adapters);
     }
 
-    private void setTargets() {
+    private void setAdapters() {
         
         ((ArrayList<Object>) this.json.get("subrules")).stream().forEach((item) -> {
             ((ArrayList<Object>)((LinkedTreeMap<String,Object>) item).get("actions")).stream().forEach((item2) -> {
                 Adapters adapters = new Adapters();
                 String target = (String) ((LinkedTreeMap<String,Object>) ((LinkedTreeMap<String,Object>)item2).get("target")).get("topic");
-                String topic = target;
+                String topic = "/SM" + target;
                 String adapter = target.substring(1).replace("/+", "/all").replace('/', '_');
                 adapters.newAdapter("target", topic, adapter);
+                ((ArrayList<Object>)((LinkedTreeMap<String,Object>) ((LinkedTreeMap<String,Object>) ((LinkedTreeMap<String,Object>)item2).get("function")).get("listen_data")).get("listeners")).stream().forEach((item3) -> {
+                    Adapters adp = new Adapters();
+                    String receiver = (String) ((LinkedTreeMap<String,Object>) item3).get("topic");
+                    Pattern tpc = Pattern.compile("/[^/]+" + receiver.replace("/+", "/[^/]+"));
+                    String adr = receiver.substring(1).replace("/+", "/all").replace('/', '_');
+                    adp.newAdapter("receiver", tpc, adr);
+                    adp.newEntry(adr, topic);
+                    
+                });
             });
         });
     }
     
-    private void setReceivers() {
+    /*private void setReceivers() {
 
         ((ArrayList<Object>) this.json.get("subrules")).stream().forEach((item) -> {
             ((ArrayList<Object>)((LinkedTreeMap<String,Object>) item).get("actions")).stream().forEach((item2) -> {
@@ -73,5 +86,5 @@ public class ExecutionP {
                 });
             });
         });
-    }
+    }*/
 }

@@ -17,6 +17,7 @@ import javafx.util.Pair;
  */
 public class Adapters {
     private static Map<String, List<Pair<Object, String>>> adapters = new HashMap<>();
+    private static HashMap<String, List<String>> relations = new HashMap<>();
     
     public List<Pair<Object, String>> getAdapters(String key){
         List<Pair<Object, String>> tmp = new ArrayList<>();
@@ -27,6 +28,10 @@ public class Adapters {
         return tmp;
     }
     
+    public List<String> getRelations(String key){
+        return relations.get(key);
+    }
+    
     public void newAdapter(String type, Object regex, String adapter){
         if(adapters.containsKey(type)){
             adapters.get(type).add(new Pair(regex, adapter));
@@ -35,6 +40,17 @@ public class Adapters {
             List<Pair<Object, String>> list = new ArrayList<>();
             list.add(new Pair(regex, adapter));
             adapters.put(type, list);
+        }
+    }
+    
+    public void newEntry(String in_event, String out_event){
+        if(relations.containsKey(in_event)){
+            relations.get(in_event).add(out_event);
+        }
+        else{
+            ArrayList<String> new_list = new ArrayList<>();
+            new_list.add(out_event);
+            relations.put(in_event, new_list);
         }
     }
 }

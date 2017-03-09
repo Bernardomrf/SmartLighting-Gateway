@@ -16,8 +16,10 @@ import javafx.util.Pair;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.wso2.siddhi.core.ExecutionPlanRuntime;
 import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
@@ -32,7 +34,7 @@ import smartlighting.Resources.Adapters;
 
 public class MQTTClient implements MqttCallback {
 
-    MqttClient client;
+    static MqttClient client;
     Adapters adapters;
     static SiddhiManager siddhiManager; 
     static ExecutionPlanRuntime executionPlanRuntime;
@@ -71,6 +73,24 @@ public class MQTTClient implements MqttCallback {
                 if(inEvents!=null){
                     System.out.println(inEvents[0].getData()[0].toString());
                     System.out.println(inEvents[0].getData()[1].toString());
+                    MemoryPersistence persistence = new MemoryPersistence();
+                    try {
+                        MqttClient sampleClient = new MqttClient("tcp://localhost:1883", "Receiving", persistence);
+                        MqttConnectOptions connOpts = new MqttConnectOptions();
+                        connOpts.setCleanSession(true);
+                        System.out.println("Connecting to broker: "+"tcp://localhost:1883");
+                        sampleClient.connect(connOpts);
+                        System.out.println("Connected");
+                        System.out.println("Publishing message: ");
+                        MqttMessage message = new MqttMessage(("{\"event\":{\"metaData\":{\"operation\":\""+inEvents[0].getData()[0].toString()+"\"},\"payloadData\":{\"value\":"+inEvents[0].getData()[1].toString()+"}}}").getBytes());
+                        message.setQos((Integer)2);
+                        sampleClient.publish("/SM/out_events/IT2/floor_0/Sala/1/1/all/1501/all/15012/all", message);
+                        System.out.println("Message published");
+                        sampleClient.disconnect();
+                        System.out.println("Disconnected");
+                    } catch (MqttException ex) {
+                        System.out.println("FOI_SE");
+                    }
                 }
             }
         });
@@ -78,7 +98,28 @@ public class MQTTClient implements MqttCallback {
             @Override
             public void receive(long timeStamp, org.wso2.siddhi.core.event.Event[] inEvents, org.wso2.siddhi.core.event.Event[] removeEvents) {
                 EventPrinter.print(timeStamp, inEvents, removeEvents);
-                System.out.println("2");
+                if(inEvents!=null){
+                    System.out.println(inEvents[0].getData()[0].toString());
+                    System.out.println(inEvents[0].getData()[1].toString());
+                    MemoryPersistence persistence = new MemoryPersistence();
+                    try {
+                        MqttClient sampleClient = new MqttClient("tcp://localhost:1883", "Receiving", persistence);
+                        MqttConnectOptions connOpts = new MqttConnectOptions();
+                        connOpts.setCleanSession(true);
+                        System.out.println("Connecting to broker: "+"tcp://localhost:1883");
+                        sampleClient.connect(connOpts);
+                        System.out.println("Connected");
+                        System.out.println("Publishing message: ");
+                        MqttMessage message = new MqttMessage(("{\"event\":{\"metaData\":{\"operation\":\""+inEvents[0].getData()[0].toString()+"\"},\"payloadData\":{\"value\":"+inEvents[0].getData()[1].toString()+"}}}").getBytes());
+                        message.setQos((Integer)2);
+                        sampleClient.publish("/SM/out_events/IT2/floor_0/Sala/1/2/all/1501/all/15012/all", message);
+                        System.out.println("Message published");
+                        sampleClient.disconnect();
+                        System.out.println("Disconnected");
+                    } catch (MqttException ex) {
+                        System.out.println("FOI_SE");
+                    }
+                }
             }
         });
 
@@ -96,6 +137,7 @@ public class MQTTClient implements MqttCallback {
             client = new MqttClient("tcp://localhost:1883", "Sending");
             client.connect();
             client.setCallback(this);
+            
             client.subscribe("/SM/in_events/IT2/floor_0/#");
 
         } catch (MqttException e) {
