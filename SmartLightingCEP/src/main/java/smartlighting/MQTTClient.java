@@ -9,8 +9,6 @@ import smartlighting.Resources.Event;
 
 import com.google.gson.Gson;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javafx.util.Pair;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -25,10 +23,7 @@ import org.wso2.siddhi.core.SiddhiManager;
 import org.wso2.siddhi.core.query.output.callback.QueryCallback;
 import org.wso2.siddhi.core.stream.input.InputHandler;
 import org.wso2.siddhi.core.util.EventPrinter;
-import smartlighting.CEP.ExecutionP;
-import redis.clients.jedis.Jedis; 
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import smartlighting.CEP.ExecPlan;
 import smartlighting.Resources.Adapters;
 
 
@@ -42,7 +37,7 @@ public class MQTTClient implements MqttCallback {
     public static void main(String[] args) {
         
         siddhiManager = new SiddhiManager();
-        ExecutionP plan = new ExecutionP(
+        ExecPlan plan = new ExecPlan(
                 
                 "define stream in_events_IT2_floor_0_Sala_1_1_all_3301_all_5700_all (device string, object int, object_instance int, resource int, resource_instance int, value float);\n" +
                 "\n" +

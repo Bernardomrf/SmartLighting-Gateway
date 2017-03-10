@@ -8,24 +8,21 @@ package smartlighting.CEP;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
-import redis.clients.jedis.Jedis;
 import smartlighting.Resources.Adapters;
 
 /**
  *
  * @author bernardo
  */
-public class ExecutionP {
+public class ExecPlan {
     
     private String ep;
     private Map<String, Object> json;
     private Adapters redis;
     
-    public ExecutionP(String ep, String json){
+    public ExecPlan(String ep, String json){
         loadJson(json);
         loadEP(ep);
         
