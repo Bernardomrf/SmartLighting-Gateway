@@ -1,0 +1,4 @@
+HOST = "193.136.93.6"
+CLIENT_ID = "mqtt"
+MQTT_TASKS = 3
+SUB_TOPIC = '#'
