@@ -11,7 +11,7 @@ class Converter:
 
     def do_work(out_topic, value, client):
 
-
+        #3.33333 100/self.max_lux
         data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(int(( 100 -(value * 3.333333)))) + '}}}'
 
         yield client.publish(out_topic, str.encode(data))
@@ -21,5 +21,3 @@ class Converter:
 
     def name(self):
         return "Converter"
-
-#( ( 100 -(value * 3.333333) )

@@ -1,4 +1,5 @@
-HOST = "193.136.93.6"
+HOST = "192.168.53.129"
 CLIENT_ID = "mqtt"
 MQTT_TASKS = 3
 SUB_TOPIC = '#'
+RULES_FOLDER = "json_rules/"
