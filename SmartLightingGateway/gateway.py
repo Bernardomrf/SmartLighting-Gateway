@@ -49,7 +49,9 @@ def message_arrive(topic, msg):
     if not enable:
         print('ignored')
         return
-
+    else:
+        print('not ignored')
+        return
     if(gc.mem_alloc()>1000000):
         gc.collect()
         print(gc.mem_alloc())
@@ -84,10 +86,8 @@ def message_arrive(topic, msg):
 
 @asyncio.coroutine
 def serve(reader, writer):
-    print(reader, writer)
-    print("================")
-    print((yield from reader.read()))
-    
+    yield from reader.read()
+
     global enable
     enable  = not enable
 
