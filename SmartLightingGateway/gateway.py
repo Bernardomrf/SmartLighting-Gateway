@@ -18,9 +18,9 @@ client = MQTTClient(confs.CLIENT_ID, confs.HOST)
 loop = asyncio.get_event_loop()
 devices = {}
 event_id = 0
+enable = False
 
-
-def main():
+async def main():
     client.DEBUG = True
     client.set_callback(message_arrive)
 
@@ -34,18 +34,23 @@ def main():
     # Load json rules
     RuleLoader.process_rules()
 
-    #client.subscribe(confs.SUB_TOPIC)
+    client.subscribe(confs.SUB_TOPIC)
+    loop.create_task(wait_message())
 
-    #loop.run_until_complete(wait_message())
+
 
 async def wait_message():
     while True:
         client.wait_msg()
-        await asyncio.sleep(0)
+        await asyncio.sleep(0.001)
 
 
 def message_arrive(topic, msg):
-    if(gc.mem_alloc() > 1000000):
+    if not enable:
+        print('ignored')
+        return
+
+    if(gc.mem_alloc()>1000000):
         gc.collect()
         print(gc.mem_alloc())
 
@@ -77,5 +82,20 @@ def message_arrive(topic, msg):
                         message.get("event").get("payloadData").get("device"), time, client))
 
 
+@asyncio.coroutine
+def serve(reader, writer):
+    print(reader, writer)
+    print("================")
+    print((yield from reader.read()))
+    
+    global enable
+    enable  = not enable
+
+
+
+
 if __name__ == '__main__':
-    main()
+    loop.create_task(asyncio.start_server(serve, "127.0.0.1", 12000))
+    loop.create_task(main())
+    loop.run_forever()
+    loop.close()
