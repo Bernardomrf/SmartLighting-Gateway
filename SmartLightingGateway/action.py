@@ -12,9 +12,11 @@ class Action:
         self.window = window
         self.converter = converter
 
-    async def do_work(out_topic, value, device, time, client):
+    async def process_event(self, message, client):
 
-        if value is 0:
+        print('Aqui')
+        print(self.out_topic)
+        '''if value is 0:
             return
 
         event_id = Devices.new_event(device)
@@ -26,4 +28,4 @@ class Action:
 
         if Devices.devices[device] is event_id:
             data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(0) + '}}}'
-            client.publish(out_topic, str.encode(data))
+            client.publish(out_topic, str.encode(data))'''

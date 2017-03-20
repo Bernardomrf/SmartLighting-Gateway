@@ -49,9 +49,7 @@ def message_arrive(topic, msg):
     if not enable:
         print('ignored')
         return
-    else:
-        print('not ignored')
-        return
+
     if(gc.mem_alloc()>1000000):
         gc.collect()
         print(gc.mem_alloc())
@@ -61,27 +59,11 @@ def message_arrive(topic, msg):
         regex = ure.compile(reg_topic)
         if regex.match(topic.decode("utf-8")):
             if not isinstance(Rules.actions_list[reg_topic], list):
-                module = Rules.actions_list[reg_topic].module
-                if(module.name() is "Window"):
-                    loop.create_task(Window.do_work(Rules.actions_list[reg_topic].out_topic,
-                                                    message.get("event").get(
-                                                        "payloadData").get("value"),
-                                                    message.get("event").get(
-                                                        "payloadData").get("device"),
-                                                    Rules.actions_list[reg_topic].module.time, client))
+                loop.create_task(Rules.actions_list[reg_topic].process_event(message, client))
 
-                elif(module.name() is "Converter"):
-                    loop.create_task(Converter.do_work(Rules.actions_list[reg_topic].out_topic,
-                                                       message.get("event").get(
-                                                           "payloadData").get("value"),
-                                                       client))
             else:
                 for action in Rules.actions_list[reg_topic]:
-                    act = action.module
-                    time = act.time
-                    loop.create_task(Window.do_work(action.out_topic,
-                        message.get("event").get("payloadData").get("value"),
-                        message.get("event").get("payloadData").get("device"), time, client))
+                    loop.create_task(action.process_event(message, client))
 
 
 @asyncio.coroutine
