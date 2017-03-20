@@ -19,6 +19,7 @@ loop = asyncio.get_event_loop()
 devices = {}
 event_id = 0
 
+
 def main():
     client.DEBUG = True
     client.set_callback(message_arrive)
@@ -30,20 +31,21 @@ def main():
         sys.exit()
     print("Connected to {}".format(confs.HOST))
 
-    #Load json rules
+    # Load json rules
     RuleLoader.process_rules()
 
-    client.subscribe(confs.SUB_TOPIC)
+    #client.subscribe(confs.SUB_TOPIC)
 
-    loop.run_until_complete(wait_message())
+    #loop.run_until_complete(wait_message())
 
 async def wait_message():
     while True:
         client.wait_msg()
         await asyncio.sleep(0)
 
+
 def message_arrive(topic, msg):
-    if(gc.mem_alloc()>1000000):
+    if(gc.mem_alloc() > 1000000):
         gc.collect()
         print(gc.mem_alloc())
 
@@ -55,22 +57,24 @@ def message_arrive(topic, msg):
                 module = Rules.actions_list[reg_topic].module
                 if(module.name() is "Window"):
                     loop.create_task(Window.do_work(Rules.actions_list[reg_topic].out_topic,
-
-                    message.get("event").get("payloadData").get("value"),
-                        message.get("event").get("payloadData").get("device"),
-                        Rules.actions_list[reg_topic].module.time, client))
+                                                    message.get("event").get(
+                                                        "payloadData").get("value"),
+                                                    message.get("event").get(
+                                                        "payloadData").get("device"),
+                                                    Rules.actions_list[reg_topic].module.time, client))
 
                 elif(module.name() is "Converter"):
                     loop.create_task(Converter.do_work(Rules.actions_list[reg_topic].out_topic,
-                        message.get("event").get("payloadData").get("value"),
-                        client))
-            '''else:
+                                                       message.get("event").get(
+                                                           "payloadData").get("value"),
+                                                       client))
+            else:
                 for action in Rules.actions_list[reg_topic]:
                     act = action.module
                     time = act.time
                     loop.create_task(Window.do_work(action.out_topic,
                         message.get("event").get("payloadData").get("value"),
-                        message.get("event").get("payloadData").get("device"), time, client))'''
+                        message.get("event").get("payloadData").get("device"), time, client))
 
 
 if __name__ == '__main__':
