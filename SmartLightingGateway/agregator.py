@@ -1,11 +1,11 @@
 class Aggregator:
 
-    def get_aggregator(a_type):
-        if a_type is 'avg':
+    def get_aggregator(_type):
+        if _type == 'avg':
             return Avg()
-        elif a_type is 'any':
+        elif _type == 'any':
             return Any()
-        elif a_type is 'none':
+        elif _type == 'none':
             return NonE()
         else:
             return None
@@ -32,13 +32,6 @@ class Any(Aggregator):
 		d['type'] = Any._type
 		return d
 
-	@staticmethod
-	def descript():
-		d = dict()
-		d['name'] = 'Any'
-		d['description'] = 'Returns value 1 if at least one of the events has value equal to 1'
-		d['type'] = Any._type
-		return d
 
 class NonE(Aggregator):
 	_type = 'none'
@@ -48,13 +41,5 @@ class NonE(Aggregator):
 
 	def get_dict(self):
 		d = dict()
-		d['type'] = NonE._type
-		return d
-
-	@staticmethod
-	def descript():
-		d = dict()
-		d['name'] = 'None'
-		d['description'] = 'Returns value 1 if all events have value equal to 0'
 		d['type'] = NonE._type
 		return d

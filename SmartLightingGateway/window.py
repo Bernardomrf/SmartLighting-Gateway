@@ -6,29 +6,14 @@ import time as Time
 
 class Window:
 
-    def get_window(w_type, value, units=None):
-        if w_type is 'length':
+    def get_window(_type, value, units=None):
+        if _type == 'length':
             return LengthWindow(value)
-        elif w_type is 'time':
+        elif _type == 'time':
             return TimeWindow(value, units)
         else:
             return None
 
-    async def do_work(out_topic, value, device, time, client):
-
-        if value is 0:
-            return
-
-        event_id = Devices.new_event(device)
-
-        data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(value) + '}}}'
-        client.publish(out_topic, str.encode(data))
-
-        await asyncio.sleep(time)
-
-        if Devices.devices[device] is event_id:
-            data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(0) + '}}}'
-            client.publish(out_topic, str.encode(data))
 
     def name(self):
         return "Window"
@@ -36,7 +21,7 @@ class Window:
 
 class LengthWindow(Window):
 
-    w_type = 'length'
+    _type = 'length'
 
     def __init__(self, value):
         self.value = value
@@ -52,7 +37,7 @@ class LengthWindow(Window):
 
 class TimeWindow(Window):
 
-    w_type = 'time'
+    _type = 'time'
 
     def __str__(self):
         return 'Time Window of %d %s'%(self.value, self.units)
@@ -63,7 +48,7 @@ class TimeWindow(Window):
 
 	def get_dict(self):
 		d = dict()
-		d['type'] = TimeWindow.w_type
+		d['type'] = TimeWindow._type
 		d['value'] = self.value
 		d['units'] = self.units
 		return d
