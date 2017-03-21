@@ -1,4 +1,4 @@
-import time
+import utime as time
 import sys
 import ubinascii
 import ujson
@@ -19,9 +19,12 @@ loop = asyncio.get_event_loop()
 devices = {}
 event_id = 0
 enable = False
+last_hb = time.time()
 
-async def main():
+@asyncio.coroutine
+def main():
     client.DEBUG = True
+
     client.set_callback(message_arrive)
 
     try:
@@ -35,22 +38,45 @@ async def main():
     RuleLoader.process_rules()
 
     client.subscribe(confs.SUB_TOPIC)
+
     loop.create_task(wait_message())
+    loop.create_task(heart_beat())
+
+    yield from asyncio.sleep(0)
 
 
-
-async def wait_message():
+@asyncio.coroutine
+def wait_message():
     while True:
         client.wait_msg()
-        await asyncio.sleep(0.001)
+        yield from asyncio.sleep(0.001)
+
+
+@asyncio.coroutine
+def heart_beat():
+    while True:
+        global enable
+
+        if ((int(time.time()) - int(last_hb)) > 6):
+            print('GatewayCEP - UP')
+            enable = True
+        else:
+            print('GatewayCEP - DOWN')
+            enable = False
+        yield from asyncio.sleep(5)
 
 
 def message_arrive(topic, msg):
-    if not enable:
-        print('ignored')
+    if topic.decode("utf-8") == confs.HB_TOPIC:
+        global last_hb
+        last_hb = time.time()
         return
 
-    if(gc.mem_alloc()>1000000):
+    if not enable:
+        #print('ignored')
+        return
+
+    if(gc.mem_alloc()>2000000):
         gc.collect()
         print(gc.mem_alloc())
 
@@ -65,19 +91,7 @@ def message_arrive(topic, msg):
                 for action in Rules.actions_list[reg_topic]:
                     loop.create_task(action.process_event(message, client))
 
-
-@asyncio.coroutine
-def serve(reader, writer):
-    yield from reader.read()
-
-    global enable
-    enable  = not enable
-
-
-
-
 if __name__ == '__main__':
-    loop.create_task(asyncio.start_server(serve, "127.0.0.1", 12000))
     loop.create_task(main())
     loop.run_forever()
     loop.close()

@@ -1,17 +1,28 @@
-import uasyncio as asyncio
+import paho.mqtt.client as MQTTClient
+import time
+import configs as confs
+import sys
+
+client = MQTTClient.Client()
 
 
-@asyncio.coroutine
-def print_http_headers(url):
-    reader, writer = yield from asyncio.open_connection(url, 12000)
-    
-    query = "GET / HTTP/1.0\r\n\r\n"
-    yield from writer.awrite(query.encode('latin-1'))
+def main():
+    client.DEBUG = True
 
 
-url = "127.0.0.1"
-loop = asyncio.get_event_loop()
-#task = asyncio.async(print_http_headers(url))
-#loop.run_until_complete(task)
-loop.run_until_complete(print_http_headers(url))
-loop.close()
+
+    try:
+        client.connect(confs.HOST, 1883)
+    except Exception:
+        print("Error while connecting to mqtt broker")
+        sys.exit()
+    print("Connected to {}".format(confs.HOST))
+
+    while True:
+        print('sending HB')
+        data = 'HB'
+        client.publish(confs.HB_TOPIC, str.encode(data))
+        time.sleep(5)
+
+if __name__ == '__main__':
+    main()

@@ -11,11 +11,11 @@ from action import Action
 class RuleLoader:
 
     def process_rules():
-        print('loading')
-        for filename in os.listdir(confs.RULES_FOLDER):
-            if filename.endswith(".json"):
-                path = confs.RULES_FOLDER + "/" + filename
-                with open(confs.RULES_FOLDER + filename) as data_file:
+        print('Loading Rules')
+
+        for filename in os.ilistdir(confs.RULES_FOLDER):
+            if filename[0].endswith(".json"):
+                with open(confs.RULES_FOLDER + filename[0]) as data_file:
                     RuleLoader.load_json(ujson.load(data_file))
 
     def load_json(data):
@@ -36,7 +36,7 @@ class RuleLoader:
                         aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
 
                     if 'converter' in action['function']['listen_data']:
-                        
+
                         converter = Converter.get_converter(action['function']['listen_data']['converter']['type'],
                         action['function']['listen_data']['converter']['max_lux'])
 
