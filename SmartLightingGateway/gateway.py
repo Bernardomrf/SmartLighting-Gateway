@@ -36,7 +36,7 @@ def main():
 
     # Load json rules
     RuleLoader.process_rules()
-
+    print(Rules.actions_list)
     client.subscribe(confs.SUB_TOPIC)
 
     loop.create_task(wait_message())

@@ -21,33 +21,32 @@ class RuleLoader:
     def load_json(data):
         for subrule in data['subrules']:
             for action in subrule['actions']:
-                for listener in action['function']['listen_data']['listeners']:
-                    window = None
-                    converter = None
-                    _filter = None
-                    aggregator = None
 
-                    if 'window' in action['function']['listen_data']:
+                window = None
+                converter = None
+                _filter = None
+                aggregator = None
 
-                        window = Window.get_window(action['function']['listen_data']['window']['type'],
-                        action['function']['listen_data']['window']['value'],
-                        action['function']['listen_data']['window']['units'])
+                if 'window' in action['function']['listen_data']:
 
-                        aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
+                    window = Window.get_window(action['function']['listen_data']['window']['type'],
+                    action['function']['listen_data']['window']['value'],
+                    action['function']['listen_data']['window']['units'])
 
-                    if 'converter' in action['function']['listen_data']:
+                    aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
 
-                        converter = Converter.get_converter(action['function']['listen_data']['converter']['type'],
-                        action['function']['listen_data']['converter']['max_lux'])
+                if 'converter' in action['function']['listen_data']:
 
-                    if 'filters' in action['function']['listen_data']:
-                        _filter = Filter(RuleLoader.get_boolean_expression(action['function']['listen_data']['filters']))
+                    converter = Converter.get_converter(action['function']['listen_data']['converter']['type'],
+                    action['function']['listen_data']['converter']['max_lux'])
 
-                    new_action = Action(listener['topic'],
-                    '/SM'+action['target']['topic'],
+                if 'filters' in action['function']['listen_data']:
+                    _filter = Filter(RuleLoader.get_boolean_expression(action['function']['listen_data']['filters']))
+
+                new_action = Action('/SM'+action['target']['topic'],
                     action['function']['name'],
                     _filter, aggregator, window, converter)
-
+                for listener in action['function']['listen_data']['listeners']:
                     Rules.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
 
     def get_boolean_expression(in_filters):

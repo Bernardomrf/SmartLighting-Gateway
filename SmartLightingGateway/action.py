@@ -7,14 +7,17 @@ import time as Time
 
 class Action:
 
-    def __init__(self, in_topic, out_topic, func_type, _filter=None, aggregator=None, window=None, converter=None):
-        self.in_topic = in_topic
+    def __init__(self, out_topic, func_type, _filter=None, aggregator=None, window=None, converter=None):
+
         self.out_topic = out_topic
         self.func_type = func_type
         self._filter = _filter
         self.aggregator = aggregator
         self.window = window
         self.converter = converter
+
+        self.in_window = False #Flag sinalizing if there is a window in action
+        self.window_values = None #variable to hold window values
 
     async def process_event(self, message, client):
         value = message.get("event").get("payloadData").get("value")
@@ -30,23 +33,33 @@ class Action:
                     if value is 0:
                         return
 
-                    event_id = Devices.new_event(device)
+                    event_id = Devices.new_event(self)
                     data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(value) + '}}}'
                     client.publish(self.out_topic, str.encode(data))
 
                     await asyncio.sleep(self.window.value)
 
-                    if Devices.devices[device] == event_id:
+                    if Devices.devices[self] == event_id:
                         data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(0) + '}}}'
                         client.publish(self.out_topic, str.encode(data))
 
                 elif self.aggregator._type == 'avg':
+
                     pass #TODO
                 else: #None
                     pass #TODO
 
-            elif self.window._type == 'time': #length
-                pass #TODO
+            elif self.window._type == 'length':
+                if self.aggregator._type == 'any':
+                    pass
+
+                elif self.aggregator._type == 'avg':
+                    if not in_window:
+                        in_window = True
+
+
+                else: #None
+                    pass #TODO
 
         if self.converter != None:
 
@@ -59,17 +72,3 @@ class Action:
                 pass
             elif self.converter._type == 'set_to_0':
                 pass
-
-        '''if value is 0:
-            return
-
-        event_id = Devices.new_event(device)
-
-        data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(value) + '}}}'
-        client.publish(out_topic, str.encode(data))
-
-        await asyncio.sleep(time)
-
-        if Devices.devices[device] is event_id:
-            data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(0) + '}}}'
-            client.publish(out_topic, str.encode(data))'''

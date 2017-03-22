@@ -15,6 +15,10 @@
                         "type": "mqtt",
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/1\/1\/+\/3302\/+\/5500\/+",
                         "value_type": "int"
+                    }, {
+                        "type": "mqtt",
+                        "topic": "\/in_events\/IT2\/floor_0\/Sala\/1\/2\/+\/3302\/+\/5500\/+",
+                        "value_type": "int"
                     }],
                     "window": {
                         "type": "time",
@@ -42,6 +46,10 @@
                         "type": "mqtt",
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/1\/2\/+\/3302\/+\/5500\/+",
                         "value_type": "int"
+                    },{
+                        "type": "mqtt",
+                        "topic": "\/in_events\/IT2\/floor_0\/Sala\/1\/1\/+\/3302\/+\/5500\/+",
+                        "value_type": "int"
                     }],
                     "window": {
                         "type": "time",
@@ -68,6 +76,10 @@
                     "listeners": [{
                         "type": "mqtt",
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/2\/1\/+\/3302\/+\/5500\/+",
+                        "value_type": "int"
+                    }, {
+                        "type": "mqtt",
+                        "topic": "\/in_events\/IT2\/floor_0\/Sala\/2\/2\/+\/3302\/+\/5500\/+",
                         "value_type": "int"
                     }],
                     "window": {
