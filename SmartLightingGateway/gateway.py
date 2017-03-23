@@ -9,7 +9,6 @@ import configs as confs
 from rules import Rules
 from converter import Converter
 from action import Action
-from devices import Devices
 from window import Window
 from rule_loader import RuleLoader
 from umqtt.simple import MQTTClient
@@ -36,6 +35,7 @@ def main():
 
     # Load json rules
     RuleLoader.process_rules()
+
     print(Rules.actions_list)
     client.subscribe(confs.SUB_TOPIC)
 

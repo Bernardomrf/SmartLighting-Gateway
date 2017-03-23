@@ -16,19 +16,16 @@
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/1\/1\/+\/3301\/+\/5700\/+",
                         "value_type": "float"
                     }],
+                    "window": {
+                        "type": "length",
+                        "value": 5
+                    },
+                    "aggregator": {
+                        "type": "avg"
+                    },
                     "converter": {
                         "type": "lux_to_percentage",
                         "max_lux": 30.0
-                    },
-                    "filters": {
-                        "op": "and",
-                        "in_filters": [{
-                            "type": "lt",
-                            "value": 26.0
-                        }, {
-                            "type": "gt",
-                            "value": 23.0
-                        }]
                     }
                 }
             }
@@ -49,19 +46,16 @@
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/1\/2\/+\/3301\/+\/5700\/+",
                         "value_type": "float"
                     }],
+                    "window": {
+                        "type": "length",
+                        "value": 5
+                    },
+                    "aggregator": {
+                        "type": "avg"
+                    },
                     "converter": {
                         "type": "lux_to_percentage",
                         "max_lux": 30.0
-                    },
-                    "filters": {
-                        "op": "and",
-                        "in_filters": [{
-                            "type": "lt",
-                            "value": 26.0
-                        }, {
-                            "type": "gt",
-                            "value": 23.0
-                        }]
                     }
                 }
             }
@@ -82,19 +76,16 @@
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/2\/1\/+\/3301\/+\/5700\/+",
                         "value_type": "float"
                     }],
+                    "window": {
+                        "type": "length",
+                        "value": 5
+                    },
+                    "aggregator": {
+                        "type": "avg"
+                    },
                     "converter": {
                         "type": "lux_to_percentage",
                         "max_lux": 30.0
-                    },
-                    "filters": {
-                        "op": "and",
-                        "in_filters": [{
-                            "type": "lt",
-                            "value": 26.0
-                        }, {
-                            "type": "gt",
-                            "value": 23.0
-                        }]
                     }
                 }
             }
@@ -115,19 +106,16 @@
                         "topic": "\/in_events\/IT2\/floor_0\/Sala\/2\/2\/+\/3301\/+\/5700\/+",
                         "value_type": "float"
                     }],
+                    "window": {
+                        "type": "length",
+                        "value": 5
+                    },
+                    "aggregator": {
+                        "type": "avg"
+                    },
                     "converter": {
                         "type": "lux_to_percentage",
                         "max_lux": 30.0
-                    },
-                    "filters": {
-                        "op": "and",
-                        "in_filters": [{
-                            "type": "lt",
-                            "value": 26.0
-                        }, {
-                            "type": "gt",
-                            "value": 23.0
-                        }]
                     }
                 }
             }

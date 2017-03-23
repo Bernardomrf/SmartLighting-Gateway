@@ -1,6 +1,5 @@
 from umqtt.simple import MQTTClient
 import configs as confs
-from devices import Devices
 import uasyncio as asyncio
 import time as Time
 

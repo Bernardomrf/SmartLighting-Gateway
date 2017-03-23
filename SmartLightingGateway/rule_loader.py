@@ -28,12 +28,16 @@ class RuleLoader:
                 aggregator = None
 
                 if 'window' in action['function']['listen_data']:
+                    if action['function']['listen_data']['window']['type'] == 'time':
+                        window = Window.get_window(action['function']['listen_data']['window']['type'],
+                        action['function']['listen_data']['window']['value'],
+                        action['function']['listen_data']['window']['units'])
+                        aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
 
-                    window = Window.get_window(action['function']['listen_data']['window']['type'],
-                    action['function']['listen_data']['window']['value'],
-                    action['function']['listen_data']['window']['units'])
-
-                    aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
+                    elif action['function']['listen_data']['window']['type'] == 'length':
+                        window = Window.get_window(action['function']['listen_data']['window']['type'],
+                        action['function']['listen_data']['window']['value'])
+                        aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
 
                 if 'converter' in action['function']['listen_data']:
 
