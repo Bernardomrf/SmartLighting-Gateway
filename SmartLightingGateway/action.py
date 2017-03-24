@@ -65,7 +65,6 @@ class Action:
 
                         if not all(i==0 for i in self.window_values):
                             Action.apply_converter(self,average,client)
-
                         else:
                             return
                     else:
@@ -76,7 +75,6 @@ class Action:
                     if len(self.window_values) == self.window.value:
                         del self.window_values[0]
                         self.window_values.append(value)
-
                         average = int(sum(self.window_values)/float(len(self.window_values)))
 
                         Action.apply_converter(self,average,client)
@@ -91,7 +89,6 @@ class Action:
 
                         if all(i==0 for i in self.window_values):
                             Action.apply_converter(self,average,client)
-
                         else:
                             return
                     else:

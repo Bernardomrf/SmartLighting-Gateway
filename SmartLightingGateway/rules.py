@@ -14,7 +14,3 @@ class Rules:
             Rules.actions_list[in_regex].append(action)
         else:
             Rules.actions_list[in_regex] = [action]
-
-    def get_actions(self, in_topic):
-        # Compare with all regex's and return the list of actions
-        pass
