@@ -1,5 +1,3 @@
-
-
 class Converter:
 
     def get_converter(_type, max_lux=None):

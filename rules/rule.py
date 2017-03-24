@@ -1,5 +1,3 @@
-
-
 class Rule:
 
     actions_list = {}
