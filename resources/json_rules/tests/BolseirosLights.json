@@ -1,15 +1,4 @@
 {
-    '/SM/in_events/IT2/floor_0/Sala/1/2/[^/]+/3301/[^/]+/5700/[^/]+': [ < Action object at fdaa880 > ],
-    '/SM/in_events/IT2/floor_0/Sala/1/2/[^/]+/3302/[^/]+/5500/[^/]+': None,
-    '/SM/in_events/IT2/floor_0/Sala/2/1/[^/]+/3301/[^/]+/5700/[^/]+': [ < Action object at fdaaec0 > ],
-    '/SM/in_events/IT2/floor_0/Sala/2/2/[^/]+/3301/[^/]+/5700/[^/]+': [ < Action object at fdab520 > ],
-    '/SM/in_events/IT2/floor_0/Sala/1/1/[^/]+/3301/[^/]+/5700/[^/]+': [ < Action object at fdaa220 > ],
-    '/SM/in_events/IT2/floor_0/Sala/2/2/[^/]+/3302/[^/]+/5500/[^/]+': None,
-    '/SM/in_events/IT2/floor_0/Sala/2/1/[^/]+/3302/[^/]+/5500/[^/]+': None,
-    '/SM/in_events/IT2/floor_0/Sala/1/1/[^/]+/3302/[^/]+/5500/[^/]+': None
-}
-
-{
     "name": "BolseirosLights",
     "subrules": [{
         "actions": [{

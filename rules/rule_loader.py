@@ -27,32 +27,32 @@ class RuleLoader:
                 converter = None
                 _filter = None
                 aggregator = None
+                if action['function']['name'] == 'set_value':
+                    if 'window' in action['function']['listen_data']:
+                        if action['function']['listen_data']['window']['type'] == 'time':
+                            window = Window.get_window(action['function']['listen_data']['window']['type'],
+                            action['function']['listen_data']['window']['value'],
+                            action['function']['listen_data']['window']['units'])
+                            aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
 
-                if 'window' in action['function']['listen_data']:
-                    if action['function']['listen_data']['window']['type'] == 'time':
-                        window = Window.get_window(action['function']['listen_data']['window']['type'],
-                        action['function']['listen_data']['window']['value'],
-                        action['function']['listen_data']['window']['units'])
-                        aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
+                        elif action['function']['listen_data']['window']['type'] == 'length':
+                            window = Window.get_window(action['function']['listen_data']['window']['type'],
+                            action['function']['listen_data']['window']['value'])
+                            aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
 
-                    elif action['function']['listen_data']['window']['type'] == 'length':
-                        window = Window.get_window(action['function']['listen_data']['window']['type'],
-                        action['function']['listen_data']['window']['value'])
-                        aggregator = Aggregator.get_aggregator(action['function']['listen_data']['aggregator']['type'])
+                    if 'converter' in action['function']['listen_data']:
 
-                if 'converter' in action['function']['listen_data']:
+                        converter = Converter.get_converter(action['function']['listen_data']['converter']['type'],
+                        action['function']['listen_data']['converter']['max_lux'])
 
-                    converter = Converter.get_converter(action['function']['listen_data']['converter']['type'],
-                    action['function']['listen_data']['converter']['max_lux'])
+                    if 'filters' in action['function']['listen_data']:
+                        _filter = Filter(RuleLoader.get_boolean_expression(action['function']['listen_data']['filters']))
 
-                if 'filters' in action['function']['listen_data']:
-                    _filter = Filter(RuleLoader.get_boolean_expression(action['function']['listen_data']['filters']))
-
-                new_action = Action('/SM'+action['target']['topic'],
-                    action['function']['name'],
-                    _filter, aggregator, window, converter)
-                for listener in action['function']['listen_data']['listeners']:
-                    Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
+                    new_action = Action('/SM'+action['target']['topic'],
+                        action['function']['name'],
+                        _filter, aggregator, window, converter)
+                    for listener in action['function']['listen_data']['listeners']:
+                        Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
 
     def get_boolean_expression(in_filters):
         if 'op' in in_filters:
