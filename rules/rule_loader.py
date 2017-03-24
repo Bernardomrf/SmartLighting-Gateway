@@ -1,12 +1,12 @@
-import ..configs as confs
+import configs as confs
 import os
 import ujson
-from rule import Rule
-from action import Action
-from ..modules.converter import Converter
-from ..modules.window import Window
-from ..modules.filters import Filter
-from ..modules.agregator import Aggregator
+from .rule import Rule
+from .action import Action
+from modules.converter import Converter
+from modules.window import Window
+from modules.filters import Filter
+from modules.agregator import Aggregator
 
 
 class RuleLoader:
@@ -52,7 +52,7 @@ class RuleLoader:
                     action['function']['name'],
                     _filter, aggregator, window, converter)
                 for listener in action['function']['listen_data']['listeners']:
-                    Rules.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
+                    Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
 
     def get_boolean_expression(in_filters):
         if 'op' in in_filters:

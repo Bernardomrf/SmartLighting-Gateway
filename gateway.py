@@ -78,14 +78,14 @@ def message_arrive(topic, msg):
         print(gc.mem_alloc())
 
     message = ujson.loads(msg)
-    for reg_topic in Rules.actions_list.keys():
+    for reg_topic in Rule.actions_list.keys():
         regex = ure.compile(reg_topic)
         if regex.match(topic.decode("utf-8")):
-            if not isinstance(Rules.actions_list[reg_topic], list):
-                loop.create_task(Rules.actions_list[reg_topic].process_event(message, client))
+            if not isinstance(Rule.actions_list[reg_topic], list):
+                loop.create_task(Rule.actions_list[reg_topic].process_event(message, client))
 
             else:
-                for action in Rules.actions_list[reg_topic]:
+                for action in Rule.actions_list[reg_topic]:
                     loop.create_task(action.process_event(message, client))
 
 if __name__ == '__main__':
