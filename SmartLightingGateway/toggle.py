@@ -12,7 +12,7 @@ def main():
 
 
     try:
-        client.connect(confs.HOST, 1883)
+        client.connect('gateway-pi.local', 1883)
     except Exception:
         print("Error while connecting to mqtt broker")
         sys.exit()
