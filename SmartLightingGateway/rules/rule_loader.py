@@ -1,12 +1,13 @@
-import configs as confs
+import .configs as confs
 import os
 import ujson
-from rules import Rules
-from converter import Converter
-from window import Window
-from filters import Filter
-from agregator import Aggregator
+from rule import Rule
 from action import Action
+from .modules.converter import Converter
+from .modules.window import Window
+from .modules.filters import Filter
+from .modules.agregator import Aggregator
+
 
 class RuleLoader:
 

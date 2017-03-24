@@ -6,11 +6,9 @@ import gc
 import ure
 import uasyncio as asyncio
 import configs as confs
-from rules import Rules
-from converter import Converter
-from action import Action
-from window import Window
-from rule_loader import RuleLoader
+from rules.rule import Rule
+from rules.action import Action
+from rules.rule_loader import RuleLoader
 from umqtt.simple import MQTTClient
 
 client = MQTTClient(confs.CLIENT_ID, confs.HOST)
@@ -35,7 +33,7 @@ def main():
 
     # Load json rules
     RuleLoader.process_rules()
-
+    print('Hellooo')
     client.subscribe(confs.SUB_TOPIC)
 
     loop.create_task(wait_message())

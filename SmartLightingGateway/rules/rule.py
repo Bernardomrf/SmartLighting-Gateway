@@ -1,7 +1,6 @@
 
 
-
-class Rules:
+class Rule:
 
     actions_list = {}
 

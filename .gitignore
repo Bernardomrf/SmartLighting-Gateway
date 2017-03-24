@@ -1,4 +1,4 @@
 
 \.DS_Store
 
-SmartLightingGateway/__pycache__/
+*.cson

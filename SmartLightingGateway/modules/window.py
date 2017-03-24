@@ -1,8 +1,3 @@
-from umqtt.simple import MQTTClient
-import configs as confs
-import uasyncio as asyncio
-import time as Time
-
 class Window:
 
     def get_window(_type, value, units=None):
