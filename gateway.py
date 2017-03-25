@@ -13,28 +13,18 @@ from umqtt.simple import MQTTClient
 
 client = MQTTClient(confs.CLIENT_ID, confs.HOST)
 loop = asyncio.get_event_loop()
-devices = {}
-event_id = 0
 enable = False
 last_hb = time.time()
 
 @asyncio.coroutine
 def main():
-    client.DEBUG = True
 
     client.set_callback(message_arrive)
-
-    try:
-        client.connect(clean_session=False)
-    except Exception:
-        print("Error while connecting to mqtt broker")
-        sys.exit()
-    print("Connected to {}".format(confs.HOST))
-
-    # Load json rules
-    RuleLoader.process_rules()
-    print('Hellooo')
+    client.connect()
     client.subscribe(confs.SUB_TOPIC)
+    client.subscribe(confs.HB_TOPIC)
+
+    RuleLoader.process_rules()
 
     loop.create_task(wait_message())
     loop.create_task(heart_beat())
@@ -46,7 +36,7 @@ def main():
 def wait_message():
     while True:
         client.wait_msg()
-        yield from asyncio.sleep(0.001)
+        yield from asyncio.sleep(0) #Needed to check heart beat (0 or 0.001)
 
 
 @asyncio.coroutine
@@ -54,26 +44,26 @@ def heart_beat():
     while True:
         global enable
 
-        if ((int(time.time()) - int(last_hb)) > 6):
+        if ((time.time() - last_hb) > confs.HB_TIMER):
             print('GatewayCEP - UP')
             enable = True
         else:
             print('GatewayCEP - DOWN')
             enable = False
-        yield from asyncio.sleep(5)
+        yield from asyncio.sleep(confs.HB_TIMER)
 
 
 def message_arrive(topic, msg):
+    
     if topic.decode("utf-8") == confs.HB_TOPIC:
         global last_hb
         last_hb = time.time()
         return
 
     if not enable:
-        #print('ignored')
         return
 
-    if(gc.mem_alloc()>2000000):
+    if(gc.mem_alloc()>confs.MAX_MEM):
         gc.collect()
         print(gc.mem_alloc())
 
