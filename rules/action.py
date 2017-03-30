@@ -15,7 +15,7 @@ class Action:
         Action.events[action] = Action.event_id
         return Action.event_id
 
-    def __init__(self, out_topic, func_type, _filter=None, aggregator=None, window=None, converter=None):
+    def __init__(self, out_topic, func_type, _filter=None, aggregator=None, window=None, converter=None, value_action=None, percent_if_true=None, percent_if_false=None):
 
         self.out_topic = out_topic
         self.func_type = func_type
@@ -23,7 +23,11 @@ class Action:
         self.aggregator = aggregator
         self.window = window
         self.converter = converter
+        self.value_action = value_action
+        self.percent_if_true = percent_if_true
+        self.percent_if_false = percent_if_false
 
+        self.bool_value = None
         self.in_window = False #Flag sinalizing if there is a window in action
         self.window_values = [] #variable to hold window values
 
@@ -100,10 +104,20 @@ class Action:
 
     def apply_converter(self,value,client):
 
+        if self.func_type == 'setif_value_percent' and self.value_action != None:
+            self.value_action.bool_value = eval(str(value))
+            return
+
         if self.converter != None:
 
             if self.converter._type == 'lux_to_percentage':
-                data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(int(( 100 -(value * (100/self.converter.max_lux))))) + '}}}'
+                lux = int(( 100 -(value * (100/self.converter.max_lux))))
+                if self.bool_value is 0 and self.bool_value is not None:
+                    lux = lux * (self.percent_if_false/100)
+                elif self.bool_value is not 0 and self.bool_value is not None:
+                    lux = lux * (self.percent_if_true/100)
+
+                data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(lux) + '}}}'
                 client.publish(self.out_topic, str.encode(data))
 
             elif self.converter._type == 'set_to_1':
@@ -114,5 +128,10 @@ class Action:
                 data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":0}}}'
                 client.publish(self.out_topic, str.encode(data))
         else:
+
+            if self.bool_value == False:
+                value = value * (self.percent_if_false/100)
+            elif self.bool_value == True:
+                value = value * (self.percent_if_true/100)
             data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(value) + '}}}'
             client.publish(self.out_topic, str.encode(data))

@@ -1,6 +1,7 @@
 import paho.mqtt.client as MQTTClient
 import time
 import sys
+import os
 
 client = MQTTClient.Client()
 
@@ -18,10 +19,18 @@ def main():
     print("Connected to {}".format(HOST))
 
     while True:
-        print('sending HB')
-        data = 'HB'
-        client.publish(HB_TOPIC, str.encode(data))
-        time.sleep(5)
+
+
+        tmp = os.popen("ps -Af").read()
+        proccount = tmp.count('org.wso2.carbon')
+
+
+        if proccount > 0:
+
+            print('sending HB')
+            data = 'HB'
+            client.publish(HB_TOPIC, str.encode(data))
+            time.sleep(1)
 
 if __name__ == '__main__':
     main()
