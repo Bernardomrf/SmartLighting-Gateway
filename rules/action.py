@@ -105,6 +105,7 @@ class Action:
     def apply_converter(self,value,client):
 
         if self.func_type == 'setif_value_percent' and self.value_action != None:
+            #print(value)
             self.value_action.bool_value = eval(str(value))
             return
 
@@ -117,7 +118,7 @@ class Action:
                 elif self.bool_value is not 0 and self.bool_value is not None:
                     lux = lux * (self.percent_if_true/100)
 
-                data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(lux) + '}}}'
+                data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(int(lux)) + '}}}'
                 client.publish(self.out_topic, str.encode(data))
 
             elif self.converter._type == 'set_to_1':
@@ -133,5 +134,5 @@ class Action:
                 value = value * (self.percent_if_false/100)
             elif self.bool_value == True:
                 value = value * (self.percent_if_true/100)
-            data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(value) + '}}}'
+            data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(int(value)) + '}}}'
             client.publish(self.out_topic, str.encode(data))
