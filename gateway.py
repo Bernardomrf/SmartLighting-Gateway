@@ -12,6 +12,8 @@ from rules.rule_loader import RuleLoader
 from umqtt.simple import MQTTClient
 
 client = MQTTClient(confs.CLIENT_ID, confs.HOST)
+client_pub = MQTTClient(confs.CLIENT_ID_PUB, confs.HOST_PUB)
+client_pub.connect()
 loop = asyncio.get_event_loop()
 enable = False
 last_hb = time.time()
@@ -35,8 +37,8 @@ def main():
 @asyncio.coroutine
 def wait_message():
     while True:
-        client.wait_msg()
-        yield from asyncio.sleep(0) #Needed to check heart beat (0 or 0.001)
+        yield client.wait_msg()
+        #yield from asyncio.sleep(0.1) #Needed to check heart beat (0 or 0.001)
 
 
 @asyncio.coroutine
@@ -54,7 +56,7 @@ def heart_beat():
 
 
 def message_arrive(topic, msg):
-    
+
     if topic.decode("utf-8") == confs.HB_TOPIC:
         global last_hb
         last_hb = time.time()
@@ -72,11 +74,11 @@ def message_arrive(topic, msg):
         regex = ure.compile(reg_topic)
         if regex.match(topic.decode("utf-8")):
             if not isinstance(Rule.actions_list[reg_topic], list):
-                loop.create_task(Rule.actions_list[reg_topic].process_event(message, client))
+                loop.create_task(Rule.actions_list[reg_topic].process_event(message, client_pub))
 
             else:
                 for action in Rule.actions_list[reg_topic]:
-                    loop.create_task(action.process_event(message, client))
+                    loop.create_task(action.process_event(message, client_pub))
 
 if __name__ == '__main__':
     loop.create_task(main())

@@ -4,3 +4,5 @@
 *.cson
 
 *.pyc
+
+sftp-config\.json
