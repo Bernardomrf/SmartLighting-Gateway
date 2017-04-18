@@ -37,8 +37,8 @@ def main():
 @asyncio.coroutine
 def wait_message():
     while True:
-        yield client.wait_msg()
-        #yield from asyncio.sleep(0.1) #Needed to check heart beat (0 or 0.001)
+        client.check_msg()
+        yield from asyncio.sleep(0) #Needed to check heart beat (0 or 0.001)
 
 
 @asyncio.coroutine
