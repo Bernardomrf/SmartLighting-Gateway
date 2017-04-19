@@ -26,8 +26,6 @@ def main():
     client.subscribe(confs.SUB_TOPIC)
     client.subscribe(confs.HB_TOPIC)
 
-    RuleLoader.process_rules()
-
     loop.create_task(wait_message())
     loop.create_task(heart_beat())
 
@@ -60,6 +58,11 @@ def message_arrive(topic, msg):
     if topic.decode("utf-8") == confs.HB_TOPIC:
         global last_hb
         last_hb = time.time()
+        return
+    print(topic.decode("utf-8"))
+    if topic.decode("utf-8") == confs.RULES_TOPIC:
+        print('entrei')
+        RuleLoader.process_rules(msg)
         return
 
     if not enable:

@@ -11,25 +11,22 @@ from modules.agregator import Aggregator
 
 class RuleLoader:
 
-    def process_rules():
+    def process_rules(msg):
         print('Loading Rules')
-
-        for filename in os.ilistdir(confs.RULES_FOLDER):
-            if filename[0].endswith(".json"):
-                with open(confs.RULES_FOLDER + filename[0]) as data_file:
-                    RuleLoader.load_json(ujson.load(data_file))
+        print(msg)
+        RuleLoader.load_json(ujson.loads(msg))
 
     def load_json(data):
-        for subrule in data['subrules']:
-            for action in subrule['actions']:
 
-                if action['function']['name'] == 'set_value':
-                    RuleLoader.get_action_modules(action, 'listen_data')
+        for action in data['actions']:
 
-                elif action['function']['name'] == 'setif_value_percent':
-                    value_action = RuleLoader.get_action_modules(action, 'listen_value')
-                    RuleLoader.get_action_modules(action, 'listen_boolean', value_action)
+            if action['function']['name'] == 'set_value':
+                RuleLoader.get_action_modules(action, 'listen_data')
 
+            elif action['function']['name'] == 'setif_value_percent':
+                value_action = RuleLoader.get_action_modules(action, 'listen_value')
+                RuleLoader.get_action_modules(action, 'listen_boolean', value_action)
+        print("Rule added")
 
     def get_action_modules(action, listen, value_action = None):
         window = None

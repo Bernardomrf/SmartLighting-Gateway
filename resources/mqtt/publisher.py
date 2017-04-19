@@ -17,11 +17,11 @@ for i in range(1,165):
 
 while 1:
     #print mqttc.publish("/SM/out_events/IT2/Floor0/Corredor/all/all/all/1501/all/all/all", '{"event": {"metaData":{"operation":"set"},"payloadData":{"value":1}}}')
-    print mqttc.publish("/SM/in_events/IT2/Floor0/Corredor/0_13_5/3/all/3302/all/5500/all", '{"event": {"metaData":{"operation":"set"},"payloadData":{"value":1}}}')
+    print mqttc.publish("/SM/in_events/IT2/Floor0/Corredor/all/all/all/3302/all/5500/all", '{"event": {"metaData":{"operation":"set"},"payloadData":{"value":1}}}')
 
     time.sleep(1)
     #print mqttc.publish("/SM/out_events/IT2/Floor0/Corredor/all/all/all/1501/all/all/all", '{"event": {"metaData":{"operation":"set"},"payloadData":{"value":0}}}')
-    print mqttc.publish("/SM/in_events/IT2/Floor0/Corredor/0_13_5/3/all/3302/all/5500/all", '{"event": {"metaData":{"operation":"set"},"payloadData":{"value":0}}}')
+    print mqttc.publish("/SM/in_events/IT2/Floor0/Corredor/all/all/all/3302/all/5500/all", '{"event": {"metaData":{"operation":"set"},"payloadData":{"value":0}}}')
 
     time.sleep(10)
 

@@ -5,5 +5,6 @@ CLIENT_ID_PUB = "gateway1_pub"
 RULES_FOLDER = "resources/json_rules/"
 SUB_TOPIC = '#'
 HB_TOPIC = '/heart_beat'
+RULES_TOPIC = '/SM/rule'
 HB_TIMER = 5
 MAX_MEM = 2000000
