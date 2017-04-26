@@ -68,14 +68,15 @@ def message_arrive(topic, msg):
     if not enable:
         return
 
-    if(gc.mem_alloc()>confs.MAX_MEM):
+    '''if(gc.mem_alloc()>confs.MAX_MEM):
         gc.collect()
-        print(gc.mem_alloc())
+        print(gc.mem_alloc())'''
 
     message = ujson.loads(msg)
     for reg_topic in Rule.actions_list.keys():
         regex = ure.compile(reg_topic)
         if regex.match(topic.decode("utf-8")):
+            print('applying rule')
             if not isinstance(Rule.actions_list[reg_topic], list):
                 loop.create_task(Rule.actions_list[reg_topic].process_event(message, client_pub))
 
