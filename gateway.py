@@ -1,15 +1,14 @@
-import utime as time
+import time as time
 import sys
-import ubinascii
-import ujson
+import json
 import gc
-import ure
-import uasyncio as asyncio
+import re
+import asyncio
 import configs as confs
 from rules.rule import Rule
 from rules.action import Action
 from rules.rule_loader import RuleLoader
-from umqtt.simple import MQTTClient
+from paho.mqtt.client import MQTTClient
 
 client = MQTTClient(confs.CLIENT_ID, confs.HOST)
 client_pub = MQTTClient(confs.CLIENT_ID_PUB, confs.HOST_PUB)
