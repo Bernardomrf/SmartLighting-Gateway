@@ -68,6 +68,8 @@ def message_arrive(topic, msg):
     if not enable:
         return
 
+    if topic.decode("utf-8") == '/SM/add_device' or topic.decode("utf-8") == '/SM/delete_device':
+        return
     '''if(gc.mem_alloc()>confs.MAX_MEM):
         gc.collect()
         print(gc.mem_alloc())'''
