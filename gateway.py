@@ -78,7 +78,7 @@ def message_arrive(topic, msg):
     for reg_topic in Rule.actions_list.keys():
         regex = ure.compile(reg_topic)
         if regex.match(topic.decode("utf-8")):
-            print('applying rule')
+            #print('applying rule')
             if not isinstance(Rule.actions_list[reg_topic], list):
                 loop.create_task(Rule.actions_list[reg_topic].process_event(message, client_pub))
 
