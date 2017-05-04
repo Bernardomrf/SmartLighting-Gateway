@@ -1,7 +1,7 @@
 HOST = "127.0.0.1"
 HOST_PUB = "sonata4.local"
-CLIENT_ID = "gateway1"
-CLIENT_ID_PUB = "gateway1_pub"
+CLIENT_ID = "gateway4"
+CLIENT_ID_PUB = "gateway4_pub"
 RULES_FOLDER = "resources/json_rules/"
 SUB_TOPIC = '#'
 HB_TOPIC = '/heart_beat'

@@ -74,6 +74,9 @@ def message_arrive(topic, msg):
         gc.collect()
         print(gc.mem_alloc())'''
 
+    if '/SM/out_events' in topic.decode("utf-8"):
+        return
+
     message = ujson.loads(msg)
     for reg_topic in Rule.actions_list.keys():
         regex = ure.compile(reg_topic)

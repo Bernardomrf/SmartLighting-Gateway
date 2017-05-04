@@ -56,7 +56,8 @@ def on_message(client, userdata, msg):
         #print(devices)
     elif msg.topic == '/SM/delete_device':
         print('remove')
-        devices.remove(msg.payload.decode("utf-8"))
+        if(msg.payload.decode("utf-8") in devices):
+            devices.remove(msg.payload.decode("utf-8"))
 
 
 def main():
@@ -70,22 +71,32 @@ def main():
         publish.single("/SM/devconfig", payload='{"device": {"device_id": "light_c'+str(i)+'"}, "objects": [{"object_id": 3, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 11}, {"resource_instance": 0, "resource_id": 16}, {"resource_instance": 0, "resource_id": 4}]}, {"object_id": 1, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 1}, {"resource_instance": 0, "resource_id": 8}, {"resource_instance": 0, "resource_id": 7}, {"resource_instance": 0, "resource_id": 6}, {"resource_instance": 0, "resource_id": 0}]}, {"object_id": 1501, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 15011}, {"resource_instance": 0, "resource_id": 15014}, {"resource_instance": 0, "resource_id": 15013}, {"resource_instance": 0, "resource_id": 15012}]}, {"object_id": 1301, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 13011}, {"resource_instance": 0, "resource_id": 13015}, {"resource_instance": 0, "resource_id": 13014}, {"resource_instance": 0, "resource_id": 13013}, {"resource_instance": 0, "resource_id": 13012}]}]}', qos=1, retain=False,
                                 hostname="sonata4.local", port=1883, client_id="", keepalive=60,
                                 will=None, auth=None, tls=None, protocol=mqtt.MQTTv311)
-        publish.single("/SM/regdevice", payload='{"device":"light_c'+str(i)+'", "gateway":"gateway-pi"}', qos=1, retain=False,
+        publish.single("/SM/regdevice", payload='{"device":"light_c'+str(i)+'", "gateway":"sonata9"}', qos=1, retain=False,
                                 hostname="sonata4.local", port=1883, client_id="", keepalive=60,
                                 will=None, auth=None, tls=None, protocol=mqtt.MQTTv311)
 
-        time.sleep(0.05)
+        time.sleep(0.1)
+
+    for i in range(1,109):
+        publish.single("/SM/devconfig", payload='{"device": {"device_id": "light'+str(i)+'"}, "objects": [{"object_id": 3, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 11}, {"resource_instance": 0, "resource_id": 16}, {"resource_instance": 0, "resource_id": 4}]}, {"object_id": 1, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 1}, {"resource_instance": 0, "resource_id": 8}, {"resource_instance": 0, "resource_id": 7}, {"resource_instance": 0, "resource_id": 6}, {"resource_instance": 0, "resource_id": 0}]}, {"object_id": 1501, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 15011}, {"resource_instance": 0, "resource_id": 15014}, {"resource_instance": 0, "resource_id": 15013}, {"resource_instance": 0, "resource_id": 15012}]}, {"object_id": 1301, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 13011}, {"resource_instance": 0, "resource_id": 13015}, {"resource_instance": 0, "resource_id": 13014}, {"resource_instance": 0, "resource_id": 13013}, {"resource_instance": 0, "resource_id": 13012}]}]}', qos=1, retain=False,
+                                hostname="sonata4.local", port=1883, client_id="", keepalive=60,
+                                will=None, auth=None, tls=None, protocol=mqtt.MQTTv311)
+        publish.single("/SM/regdevice", payload='{"device":"light'+str(i)+'", "gateway":"sonata9"}', qos=1, retain=False,
+                                hostname="sonata4.local", port=1883, client_id="", keepalive=60,
+                                will=None, auth=None, tls=None, protocol=mqtt.MQTTv311)
+
+        time.sleep(0.1)
 
     for i in range(1,165):
 
         publish.single("/SM/devconfig", payload='{"objects": [{"object_id": 3, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 11}, {"resource_instance": 0, "resource_id": 16}, {"resource_instance": 0, "resource_id": 4}]}, {"object_id": 1, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 1}, {"resource_instance": 0, "resource_id": 8}, {"resource_instance": 0, "resource_id": 7}, {"resource_instance": 0, "resource_id": 6}, {"resource_instance": 0, "resource_id": 0}]}, {"object_id": 3302, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 5500}]}, {"object_id": 1301, "object_instance": 0, "resources": [{"resource_instance": 0, "resource_id": 13011}, {"resource_instance": 0, "resource_id": 13015}, {"resource_instance": 0, "resource_id": 13014}, {"resource_instance": 0, "resource_id": 13013}, {"resource_instance": 0, "resource_id": 13012}]}], "device": {"device_id": "motion'+ str(i) +'"}}', qos=1, retain=False,
                                 hostname="sonata4.local", port=1883, client_id="", keepalive=60,
                                 will=None, auth=None, tls=None, protocol=mqtt.MQTTv311)
-        publish.single("/SM/regdevice", payload='{"device":"motion' + str(i) + '", "gateway":"gateway-pi"}', qos=1, retain=False,
+        publish.single("/SM/regdevice", payload='{"device":"motion' + str(i) + '", "gateway":"sonata9"}', qos=1, retain=False,
                                 hostname="sonata4.local", port=1883, client_id="", keepalive=60,
                                 will=None, auth=None, tls=None, protocol=mqtt.MQTTv311)
 
-        time.sleep(0.05)
+        time.sleep(0.1)
         RandomGenerator("motion" + str(i)).start()
 
 
