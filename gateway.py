@@ -44,6 +44,9 @@ def heart_beat():
     while True:
         global enable
 
+        data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
+        client_pub.publish('/SM/hb/', str.encode(data))
+
         if ((time.time() - last_hb) > confs.HB_TIMER):
             print('GatewayCEP - UP')
             enable = True

@@ -8,3 +8,4 @@ HB_TOPIC = '/heart_beat'
 RULES_TOPIC = '/SM/rule'
 HB_TIMER = 5
 MAX_MEM = 2000000
+GATEWAY_NAME = 'sonata10.local'
