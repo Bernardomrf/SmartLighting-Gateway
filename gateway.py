@@ -62,10 +62,22 @@ def message_arrive(topic, msg):
         global last_hb
         last_hb = time.time()
         return
-    print(topic.decode("utf-8"))
-    if topic.decode("utf-8") == confs.RULES_TOPIC:
+
+    if topic.decode("utf-8") == '/SM/add_rule':
         print('entrei')
         RuleLoader.process_rules(msg)
+        return
+    if topic.decode("utf-8") == '/SM/remove_rule':
+
+        rule_id = msg.decode("utf-8")
+        #print(Rule.actions_list)
+        for reg_topic in Rule.actions_list:
+            for i, (r_id, action) in enumerate(Rule.actions_list[reg_topic]):
+                if r_id == rule_id:
+                    del Rule.actions_list[reg_topic][i]
+                    if len(Rule.actions_list[reg_topic]) is 0:
+                        del Rule.actions_list[reg_topic]
+        #print(Rule.actions_list)
         return
 
     if not enable:
@@ -86,10 +98,10 @@ def message_arrive(topic, msg):
         if regex.match(topic.decode("utf-8")):
             #print('applying rule')
             if not isinstance(Rule.actions_list[reg_topic], list):
-                loop.create_task(Rule.actions_list[reg_topic].process_event(message, client_pub))
+                loop.create_task(Rule.actions_list[reg_topic][1].process_event(message, client_pub))
 
             else:
-                for action in Rule.actions_list[reg_topic]:
+                for (r_id, action) in Rule.actions_list[reg_topic]:
                     loop.create_task(action.process_event(message, client_pub))
 
 if __name__ == '__main__':

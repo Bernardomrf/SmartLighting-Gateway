@@ -14,12 +14,12 @@
     "confirm_sync": true,
     "confirm_overwrite_newer": false,
 
-    "host": "sonata9",
-    "user": "atnogcloud",
+    "host": "gateway-pi2",
+    "user": "pi",
     //"password": "pwd",
     "port": "22",
 
-    "remote_path": "/home/atnogcloud/SmartLighting-Gateway/",
+    "remote_path": "/home/pi/SmartLighting-Gateway/",
     "ignore_regexes": [
         "\\.sublime-(project|workspace)", "sftp-config(-alt\\d?)?\\.json",
         "sftp-settings\\.json", "/venv/", "\\.svn/", "\\.hg/", "\\.git/",

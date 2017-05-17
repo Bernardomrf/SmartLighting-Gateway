@@ -18,17 +18,17 @@ class RuleLoader:
 
     def load_json(data):
 
-        for action in data['actions']:
+        for action in data['rule']['actions']:
 
             if action['function']['name'] == 'set_value':
-                RuleLoader.get_action_modules(action, 'listen_data')
+                RuleLoader.get_action_modules(action, data['id'], 'listen_data')
 
             elif action['function']['name'] == 'setif_value_percent':
-                value_action = RuleLoader.get_action_modules(action, 'listen_value')
-                RuleLoader.get_action_modules(action, 'listen_boolean', value_action)
+                value_action = RuleLoader.get_action_modules(action, data['id'], 'listen_value')
+                RuleLoader.get_action_modules(action, data['id'], 'listen_boolean', value_action)
         print("Rule added")
 
-    def get_action_modules(action, listen, value_action = None):
+    def get_action_modules(action, r_id, listen, value_action = None):
         window = None
         converter = None
         _filter = None
@@ -60,7 +60,7 @@ class RuleLoader:
                 action['function']['name'],
                 _filter, aggregator, window, converter)
             for listener in action['function'][listen]['listeners']:
-                Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
+                Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"), r_id)
 
         elif listen == 'listen_value':
             new_action = Action('/SM'+action['target']['topic'],
@@ -68,7 +68,7 @@ class RuleLoader:
                 _filter, aggregator, window, converter, None, action['function']['percent_if_true'], action['function']['percent_if_false'])
 
             for listener in action['function'][listen]['listeners']:
-                Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
+                Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"), r_id)
 
             return new_action
 
@@ -78,7 +78,7 @@ class RuleLoader:
                 _filter, aggregator, window, converter, value_action)
 
             for listener in action['function'][listen]['listeners']:
-                Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"))
+                Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"), r_id)
 
     def get_boolean_expression(in_filters):
         if 'op' in in_filters:
