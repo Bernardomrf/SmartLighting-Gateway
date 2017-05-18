@@ -14,7 +14,7 @@ from umqtt.simple import MQTTClient
 client = MQTTClient(confs.CLIENT_ID, confs.HOST)
 client_pub = MQTTClient(confs.CLIENT_ID_PUB, confs.HOST_PUB)
 client_pub.connect()
-loop = asyncio.get_event_loop()
+loop = asyncio.get_event_loop(1000)
 enable = False
 last_hb = time.time()
 
