@@ -3,7 +3,7 @@ from umqtt.simple import MQTTClient
 import configs as confs
 
 import uasyncio as asyncio
-import time as Time
+import utime as time
 
 class Action:
 
@@ -49,8 +49,9 @@ class Action:
                     Action.apply_converter(self, value, client)
 
                     # Apply Time window
+                    tm = time.time()
                     await asyncio.sleep(self.window.value)
-
+                    print(time.time()-tm)
                     if Action.events[self] == event_id:
                         Action.apply_converter(self, 0, client)
 
