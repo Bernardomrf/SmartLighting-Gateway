@@ -9,6 +9,7 @@ import configs as confs
 from rules.rule import Rule
 from rules.action import Action
 from rules.rule_loader import RuleLoader
+from rules.device_register import DeviceRegister
 from umqtt.simple import MQTTClient
 
 client = MQTTClient(confs.CLIENT_ID, confs.HOST)
@@ -17,9 +18,11 @@ client_pub.connect()
 loop = asyncio.get_event_loop(1000)
 enable = False
 last_hb = time.time()
+devices_on_control = []
 
 @asyncio.coroutine
 def main():
+
 
     client.set_callback(message_arrive)
     client.connect()
@@ -46,7 +49,7 @@ def heart_beat():
 
         data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
         client_pub.publish('/SM/hb/', str.encode(data))
-
+        print(devices_on_control)
         if ((time.time() - last_hb) > confs.HB_TIMER):
             print('GatewayCEP - UP')
             enable = True
@@ -57,14 +60,14 @@ def heart_beat():
 
 
 def message_arrive(topic, msg):
-
+    #print(topic)
     if topic.decode("utf-8") == confs.HB_TOPIC:
         global last_hb
         last_hb = time.time()
         return
 
     if topic.decode("utf-8") == '/SM/add_rule':
-        print('entrei')
+        #print('entrei')
         RuleLoader.process_rules(msg)
         return
     if topic.decode("utf-8") == '/SM/remove_rule':
@@ -80,14 +83,31 @@ def message_arrive(topic, msg):
         #print(Rule.actions_list)
         return
 
-    if not enable:
+
+    if topic.decode("utf-8") == '/SM/send_devices':
+        DeviceRegister.register(client_pub)
         return
 
-    if topic.decode("utf-8") == '/SM/add_device' or topic.decode("utf-8") == '/SM/delete_device':
+    if topic.decode("utf-8") == '/SM/add_device':
+        print('adding device')
+        device = msg.decode("utf-8")
+        devices_on_control.append(device)
         return
+
+    if topic.decode("utf-8") == '/SM/delete_device':
+        device = msg.decode("utf-8")
+        try:
+            del devices_on_control[devices_on_control.index(device)]
+        except Exception as e:
+            print('Device not found')
+        return
+
     '''if(gc.mem_alloc()>confs.MAX_MEM):
         gc.collect()
         print(gc.mem_alloc())'''
+
+    if not enable:
+        return
 
     if '/SM/out_events' in topic.decode("utf-8"):
         return
