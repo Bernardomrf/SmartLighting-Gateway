@@ -12,8 +12,8 @@ from modules.agregator import Aggregator
 class RuleLoader:
 
     def process_rules(msg):
-        print('Loading Rules')
-        print(msg)
+        print('Loading Rule')
+        #print(msg)
         RuleLoader.load_json(ujson.loads(msg))
 
     def load_json(data):
