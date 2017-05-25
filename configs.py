@@ -30,19 +30,19 @@ for i in range(1,50):
 for i in range(1,50):
     DEVICES.append('hum%d'%i)
 
-
-for i in range(1,157):
-    DEVICES.append('lux%d'%i)
-
 """
-for i in range(110,165):
+for i in range(1,157):
+    DEVICE_LUX.append('lux%d'%i)
+
+
+for i in range(1,165):
     DEVICE_MOTION.append('motion%d'%i)
 
-"""
+
 for i in range(1,109):
-    DEVICES.append('light%d'%i)
+    DEVICE_LIGHT.append('light%d'%i)
 
-
+"""
 for i in range(1,34):
     DEVICES.append('light_b%d'%i)
 
