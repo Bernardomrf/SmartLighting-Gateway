@@ -26,8 +26,8 @@ def main():
 
     client.set_callback(message_arrive)
     client.connect()
-    client.subscribe(confs.SUB_TOPIC)
-    client.subscribe(confs.HB_TOPIC)
+    client.subscribe(confs.SUB_TOPIC, qos=1)
+    client.subscribe(confs.HB_TOPIC, qos=1)
 
     loop.create_task(wait_message())
     loop.create_task(heart_beat())
