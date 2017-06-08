@@ -46,11 +46,12 @@ def wait_message():
 def heart_beat():
     while True:
         global enable
+        if enable:
 
-        data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
-        client_pub.publish('/SM/hb/', str.encode(data))
-        #print(devices_on_control)
-        print(Rule.actions_list.keys())
+            data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
+            client_pub.publish('/SM/hb/', str.encode(data))
+            #print(devices_on_control)
+            print(Rule.actions_list.keys())
         if ((time.time() - last_hb) > confs.HB_TIMER):
             print('GatewayCEP - UP')
             enable = True
@@ -65,6 +66,9 @@ def message_arrive(topic, msg):
     if topic.decode("utf-8") == confs.HB_TOPIC:
         global last_hb
         last_hb = time.time()
+        return
+
+    if not enable:
         return
 
     if topic.decode("utf-8") == '/SM/add_rule':
@@ -108,8 +112,7 @@ def message_arrive(topic, msg):
         gc.collect()
         print(gc.mem_alloc())'''
 
-    if not enable:
-        return
+
 
     if '/SM/out_events' in topic.decode("utf-8"):
         return
