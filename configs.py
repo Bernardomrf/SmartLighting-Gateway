@@ -1,14 +1,14 @@
 HOST = "127.0.0.1"
 HOST_PUB = "sonata4.local"
-CLIENT_ID = "gateway2"
-CLIENT_ID_PUB = "gateway2_pub"
+CLIENT_ID = "gateway4"
+CLIENT_ID_PUB = "gateway4_pub"
 RULES_FOLDER = "resources/json_rules/"
 SUB_TOPIC = '#'
 HB_TOPIC = '/heart_beat'
 RULES_TOPIC = '/SM/rule'
 HB_TIMER = 5
 MAX_MEM = 2000000
-GATEWAY_NAME = 'gateway-pi2.local'
+GATEWAY_NAME = 'gateway-pi4.local'
 DEVICE_AC = []
 DEVICE_TMP = []
 DEVICE_HUM = []

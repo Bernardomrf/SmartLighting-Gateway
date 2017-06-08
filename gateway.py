@@ -49,7 +49,8 @@ def heart_beat():
 
         data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
         client_pub.publish('/SM/hb/', str.encode(data))
-        print(devices_on_control)
+        #print(devices_on_control)
+        print(Rule.actions_list.keys())
         if ((time.time() - last_hb) > confs.HB_TIMER):
             print('GatewayCEP - UP')
             enable = True
@@ -85,11 +86,12 @@ def message_arrive(topic, msg):
 
 
     if topic.decode("utf-8") == '/SM/send_devices':
+        print('Send Devices')
         DeviceRegister.register(client_pub)
         return
 
     if topic.decode("utf-8") == '/SM/add_device':
-        print('adding device')
+        #print('adding device')
         device = msg.decode("utf-8")
         devices_on_control.append(device)
         return
@@ -112,17 +114,19 @@ def message_arrive(topic, msg):
     if '/SM/out_events' in topic.decode("utf-8"):
         return
 
-    message = ujson.loads(msg)
-    for reg_topic in Rule.actions_list.keys():
-        regex = ure.compile(reg_topic)
-        if regex.match(topic.decode("utf-8")):
-            #print('applying rule')
-            if not isinstance(Rule.actions_list[reg_topic], list):
-                loop.create_task(Rule.actions_list[reg_topic][1].process_event(message, client_pub))
+    if '/SM/in_events' in topic.decode("utf-8"):
 
-            else:
-                for (r_id, action) in Rule.actions_list[reg_topic]:
-                    loop.create_task(action.process_event(message, client_pub))
+        message = ujson.loads(msg)
+        for reg_topic in Rule.actions_list.keys():
+            regex = ure.compile(reg_topic)
+            if regex.match(topic.decode("utf-8")):
+                #print('applying rule')
+                if not isinstance(Rule.actions_list[reg_topic], list):
+                    loop.create_task(Rule.actions_list[reg_topic][1].process_event(message, client_pub))
+
+                else:
+                    for (r_id, action) in Rule.actions_list[reg_topic]:
+                        loop.create_task(action.process_event(message, client_pub))
 
 if __name__ == '__main__':
     loop.create_task(main())
