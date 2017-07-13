@@ -71,6 +71,7 @@ def heart_beat():
 def event_trigger(topic, msg):
 
     if '/SM/out_events' in topic.decode("utf-8"):
+        print(topic)
         return
 
     if '/SM/in_events' in topic.decode("utf-8"):
@@ -102,7 +103,7 @@ def message_arrive(topic, msg):
         topics = RuleLoader.process_rules(msg)
         # SUBSCREVER AOS TOPICOS QUE O PROCESS RULE APANHA(IN EVENTS )
         for tpc in topics:
-            print(tpc)
+            #print(tpc)
             client_pub.subscribe(tpc, qos=1)
 
         return
@@ -127,7 +128,12 @@ def message_arrive(topic, msg):
 
     if topic.decode("utf-8") == '/SM/add_device':
         #print('adding device')
-        device = msg.decode("utf-8")
+        json_dict = ujson.loads(msg)
+        device = list(json_dict.keys())[0]
+        topics = json_dict[device]
+        for tpc in topics:
+            print(tpc)
+            client_pub.subscribe(tpc, qos=1)
         devices_on_control.append(device)
         return
 
