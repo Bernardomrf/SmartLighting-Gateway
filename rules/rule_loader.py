@@ -14,18 +14,25 @@ class RuleLoader:
     def process_rules(msg):
         print('Loading Rule')
         #print(msg)
-        RuleLoader.load_json(ujson.loads(msg))
+        topics = RuleLoader.load_json(ujson.loads(msg))
+
+        return topics
 
     def load_json(data):
+        topics = []
 
         for action in data['rule']['actions']:
 
             if action['function']['name'] == 'set_value':
-                RuleLoader.get_action_modules(action, data['id'], 'listen_data')
+                topics += RuleLoader.get_action_modules(action, data['id'], 'listen_data')
 
             elif action['function']['name'] == 'setif_value_percent':
-                value_action = RuleLoader.get_action_modules(action, data['id'], 'listen_value')
-                RuleLoader.get_action_modules(action, data['id'], 'listen_boolean', value_action)
+
+                returns = RuleLoader.get_action_modules(action, data['id'], 'listen_value')
+                value_action = returns[0]
+                topics += returns[1]
+                topics += RuleLoader.get_action_modules(action, data['id'], 'listen_boolean', value_action)
+        return topics
         print("Rule added")
 
     def get_action_modules(action, r_id, listen, value_action = None):
@@ -33,6 +40,7 @@ class RuleLoader:
         converter = None
         _filter = None
         aggregator = None
+        topics = []
 
         if 'window' in action['function'][listen]:
             if action['function'][listen]['window']['type'] == 'time':
@@ -60,7 +68,9 @@ class RuleLoader:
                 action['function']['name'],
                 _filter, aggregator, window, converter)
             for listener in action['function'][listen]['listeners']:
+                topics.append('/SM'+listener['topic'])
                 Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"), r_id)
+            return topics
 
         elif listen == 'listen_value':
             new_action = Action('/SM'+action['target']['topic'],
@@ -68,9 +78,10 @@ class RuleLoader:
                 _filter, aggregator, window, converter, None, action['function']['percent_if_true'], action['function']['percent_if_false'])
 
             for listener in action['function'][listen]['listeners']:
+                topics.append('/SM'+listener['topic'])
                 Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"), r_id)
 
-            return new_action
+            return (new_action, topics)
 
         elif listen == 'listen_boolean':
             new_action = Action('/SM'+action['target']['topic'],
@@ -78,7 +89,10 @@ class RuleLoader:
                 _filter, aggregator, window, converter, value_action)
 
             for listener in action['function'][listen]['listeners']:
+                topics.append('/SM'+listener['topic'])
                 Rule.add_action(new_action, '/SM'+listener['topic'].replace("/+","/[^/]+"), r_id)
+
+            return topics
 
     def get_boolean_expression(in_filters):
         if 'op' in in_filters:
