@@ -54,6 +54,7 @@ def wait_message():
 def heart_beat():
     while True:
         global enable
+        print(devices_on_control)
         if enable:
 
             data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
@@ -134,10 +135,12 @@ def message_arrive(topic, msg):
         for tpc in topics:
             print(tpc)
             client_pub.subscribe(tpc, qos=1)
-        devices_on_control.append(device)
+        if device not in devices_on_control:
+            devices_on_control.append(device)
         return
 
     if topic.decode("utf-8") == '/SM/delete_device':
+        print('delete')
         device = msg.decode("utf-8")
         try:
             del devices_on_control[devices_on_control.index(device)]
