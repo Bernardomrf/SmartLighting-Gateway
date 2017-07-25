@@ -19,6 +19,7 @@ loop = asyncio.get_event_loop(1000)
 enable = False
 last_hb = time.time()
 devices_on_control = []
+gw_in_events = {}
 
 @asyncio.coroutine
 def main():
@@ -30,6 +31,8 @@ def main():
     client_pub.connect()
     client.subscribe(confs.SUB_TOPIC, qos=1)
     client.subscribe(confs.HB_TOPIC, qos=1)
+    client_pub.subscribe(confs.IN_TOPICS_TOPIC, qos=1)
+    client_pub.subscribe(confs.OUT_TOPICS_TOPIC, qos=1)
 
     loop.create_task(get_message())
     loop.create_task(wait_message())
@@ -54,7 +57,8 @@ def wait_message():
 def heart_beat():
     while True:
         global enable
-        print(devices_on_control)
+        print(gw_in_events)
+        print(Rule.output_topics_per_gw)
         if enable:
 
             data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
@@ -70,6 +74,8 @@ def heart_beat():
         yield from asyncio.sleep(confs.HB_TIMER)
 
 def event_trigger(topic, msg):
+    global gw_in_events
+    global enable
 
     if '/SM/out_events' in topic.decode("utf-8"):
         print(topic)
@@ -83,11 +89,37 @@ def event_trigger(topic, msg):
             if regex.match(topic.decode("utf-8")):
                 #print('applying rule')
                 if not isinstance(Rule.actions_list[reg_topic], list):
-                    loop.create_task(Rule.actions_list[reg_topic][1].process_event(message, client_pub))
+                    loop.create_task(Rule.actions_list[reg_topic][1].process_event(message, client_pub, Rule.actions_list[reg_topic][0], enable))
 
                 else:
                     for (r_id, action) in Rule.actions_list[reg_topic]:
-                        loop.create_task(action.process_event(message, client_pub))
+                        loop.create_task(action.process_event(message, client_pub, r_id, enable))
+
+
+    if '/gateways/in_topics' in topic.decode("utf-8"):
+        gw_in_events = ujson.loads(msg)
+
+    if '/gateways/out_topics' in topic.decode("utf-8"):
+        Rule.output_topics_per_gw = ujson.loads(msg)
+
+
+def compare_topics(in_topic, rule_topic):
+
+    in_topic = in_topic.split('/')
+    rule_topic = rule_topic.split('/')
+
+    for i, txt in enumerate(rule_topic):
+        try:
+            if txt == 'all':
+                return True
+
+            elif txt != in_topic[i]:
+                return False
+
+        except Exception as e:
+            return True
+
+    return True
 
 def message_arrive(topic, msg):
     #print(topic)
@@ -97,8 +129,39 @@ def message_arrive(topic, msg):
         return
 
     if not enable:
-        return
+        global gw_in_events
+        #TERCEIRO CENARIO
+        if '/my_device' in topic.decode("utf-8"):
+            ##
+            new_topic = topic.decode("utf-8").replace("/my_device", "")
+            ## PUBLISH IN GATEWAYS
 
+
+
+            return
+
+
+
+        if '/SM/out_events' in topic.decode("utf-8"):
+            print(topic)
+            return
+
+        if '/SM/in_events' in topic.decode("utf-8"):
+
+            message = ujson.loads(msg)
+            for reg_topic in Rule.actions_list.keys():
+                regex = ure.compile(reg_topic)
+                if regex.match(topic.decode("utf-8")):
+                    #print('applying rule')
+                    if not isinstance(Rule.actions_list[reg_topic], list):
+                        loop.create_task(Rule.actions_list[reg_topic][1].process_event(message, client_pub, Rule.actions_list[reg_topic][0], enable))
+
+                    else:
+                        for (r_id, action) in Rule.actions_list[reg_topic]:
+                            loop.create_task(action.process_event(message, client_pub, r_id, enable))
+
+        return
+############################################################################################
     if topic.decode("utf-8") == '/SM/add_rule':
         #print('entrei')
         topics = RuleLoader.process_rules(msg)
@@ -147,6 +210,7 @@ def message_arrive(topic, msg):
         except Exception as e:
             print('Device not found')
         return
+
 
     '''if(gc.mem_alloc()>confs.MAX_MEM):
         gc.collect()

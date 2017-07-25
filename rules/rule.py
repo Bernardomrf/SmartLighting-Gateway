@@ -1,6 +1,7 @@
 class Rule:
 
     actions_list = {}
+    output_topics_per_gw = {}
 
     def __init__(self, action, in_regex, r_id):
         Rule.actions_list[in_regex].append((r_id, action))

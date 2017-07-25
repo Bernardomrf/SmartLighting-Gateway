@@ -31,7 +31,7 @@ class Action:
         self.in_window = False #Flag sinalizing if there is a window in action
         self.window_values = [] #variable to hold window values
 
-    async def process_event(self, message, client):
+    async def process_event(self, message, client, r_id, enable):
         value = message.get("event").get("payloadData").get("value")
 
         if self._filter != None and not self._filter.evaluate(value):
@@ -46,14 +46,14 @@ class Action:
 
                     event_id = Action.new_event(self)
 
-                    Action.apply_converter(self, value, client)
+                    Action.apply_converter(self, value, client,r_id, enable)
 
                     # Apply Time window
                     #tm = time.time()
                     await asyncio.sleep(self.window.value)
                     #print(time.time()-tm)
                     if Action.events[self] == event_id:
-                        Action.apply_converter(self, 0, client)
+                        Action.apply_converter(self, 0, client, r_id, enable)
 
                 elif self.aggregator._type == 'avg':
                     pass #TODO
@@ -69,7 +69,7 @@ class Action:
                         self.window_values.append(value)
 
                         if not all(i==0 for i in self.window_values):
-                            Action.apply_converter(self,average,client)
+                            Action.apply_converter(self,average,client,r_id, enable)
                         else:
                             return
                     else:
@@ -82,7 +82,7 @@ class Action:
                         self.window_values.append(value)
                         average = int(sum(self.window_values)/float(len(self.window_values)))
 
-                        Action.apply_converter(self,average,client)
+                        Action.apply_converter(self,average,client,r_id, enable)
                     else:
                         self.window_values.append(value)
                         return
@@ -93,7 +93,7 @@ class Action:
                         self.window_values.append(value)
 
                         if all(i==0 for i in self.window_values):
-                            Action.apply_converter(self,average,client)
+                            Action.apply_converter(self,average,client,r_id, enable)
                         else:
                             return
                     else:
@@ -101,9 +101,9 @@ class Action:
                         return
 
         else:
-            Action.apply_converter(self,value,client)
+            Action.apply_converter(self,value,client, r_id, enable)
 
-    def apply_converter(self,value,client):
+    def apply_converter(self,value,client,r_id, enable):
 
         if self.func_type == 'setif_value_percent' and self.value_action != None:
             #print(value)
@@ -120,15 +120,18 @@ class Action:
                     lux = lux * (self.percent_if_true/100)
 
                 data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(int(lux)) + '}}}'
-                client.publish(self.out_topic, str.encode(data))
+                Action.send_gateways(data, self.out_topic, r_id, enable, client)
+                #client.publish(self.out_topic, str.encode(data))
 
             elif self.converter._type == 'set_to_1':
                 data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":1}}}'
-                client.publish(self.out_topic, str.encode(data))
+                Action.send_gateways(data, self.out_topic, r_id, enable, client)
+                #client.publish(self.out_topic, str.encode(data))
 
             elif self.converter._type == 'set_to_0':
                 data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":0}}}'
-                client.publish(self.out_topic, str.encode(data))
+                Action.send_gateways(data, self.out_topic, r_id, enable, client)
+                #client.publish(self.out_topic, str.encode(data))
         else:
 
             if self.bool_value == False:
@@ -136,4 +139,17 @@ class Action:
             elif self.bool_value == True:
                 value = value * (self.percent_if_true/100)
             data = '{"event":{"metaData":{"operation":"set"},"payloadData":{"value":' + str(int(value)) + '}}}'
-            client.publish(self.out_topic, str.encode(data))
+            Action.send_gateways(data, self.out_topic, r_id, enable, client)
+            #client.publish(self.out_topic, str.encode(data))
+
+    def send_gateways(data, out_topic, r_id, enable, client):
+
+        if enable:
+            client.publish(out_topic, str.encode(data))
+        else:
+            for gw in Rule.output_topics_per_gw[r_id]:
+                gw_client = MQTTClient("pub_output", gw)
+                gw_client.connect()
+                gw_client.publish(out_topic, str.encode(data))
+                gw_client.disconnect()
+
