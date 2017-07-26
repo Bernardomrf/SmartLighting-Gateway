@@ -36,6 +36,7 @@ def main():
     client_pub.subscribe(confs.OUT_TOPICS_TOPIC, qos=1)
     client_pub.subscribe(confs.HB_TOPIC, qos=1)
 
+    loop.create_task(simulate_in_events())
     loop.create_task(get_message())
     loop.create_task(wait_message())
     loop.create_task(heart_beat())
@@ -59,7 +60,7 @@ def wait_message():
 def heart_beat():
     while True:
         global enable
-        print(gw_in_events)
+        print(devices_on_control)
         print(sensors_list)
         if enable:
 
@@ -191,7 +192,7 @@ def message_arrive(topic, msg):
         device = list(json_dict.keys())[0]
         topics = json_dict[device]
         for tpc in topics:
-            print(tpc)
+            #print(tpc)
             client_pub.subscribe(tpc, qos=1)
         if device not in devices_on_control:
             devices_on_control.append(device)
@@ -199,12 +200,15 @@ def message_arrive(topic, msg):
 
     if topic.decode("utf-8") == '/SM/delete_device':
         print('delete')
+
         device = msg.decode("utf-8")
+        print(device)
         try:
             del devices_on_control[devices_on_control.index(device)]
-            del sensors_list[sensors_list.index(device)]
+            del sensors_list[device]
         except Exception as e:
-            print('Device not found')
+            print('Sensor not found')
+
         return
 
 
@@ -223,6 +227,10 @@ def simulate_in_events():
                 if 'motion' in device:
                     in_topic = topic + '/3302/0/5500/0'
                     data = '{"event": {"payloadData": {"value": 1, "object_instance": 0, "resource_instance": 0, "object": 3302, "device": "motion125", "resource": 5500}}}'
+                    send_in_event(in_topic, data)
+                    yield from asyncio.sleep(1)
+                    in_topic = topic + '/3302/0/5500/0'
+                    data = '{"event": {"payloadData": {"value": 0, "object_instance": 0, "resource_instance": 0, "object": 3302, "device": "motion125", "resource": 5500}}}'
 
                 elif 'lux' in device:
                     in_topic = topic + '/3301/0/5700/0'
@@ -237,8 +245,21 @@ def simulate_in_events():
                 b'{"event": {"payloadData": {"value": 6.95, "object_instance": 0, "resource_instance": 0, "object": 3301, "device": "lux38", "resource": 5700}}}'"""
 
 
-def send_in_event(topic, data):
+def send_in_event(in_topic, data):
     global gw_in_events
+
+    gateways_to_send = []
+    for topic in gw_in_events:
+        if compare_topics(in_topic, topic):
+            for gw in gw_in_events[topic]:
+                gateways_to_send.append(gw)
+
+    gateways_to_send = list(set(gateways_to_send))
+    for gw in gateways_to_send:
+        gw_client = MQTTClient("pub_input", gw)
+        gw_client.connect()
+        gw_client.publish(in_topic, str.encode(data))
+        gw_client.disconnect()
 
 
 def compare_topics(in_topic, rule_topic):
@@ -249,7 +270,7 @@ def compare_topics(in_topic, rule_topic):
     for i, txt in enumerate(rule_topic):
         try:
             if txt == '+':
-                return True
+                continue
 
             elif txt != in_topic[i]:
                 return False

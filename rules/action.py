@@ -148,7 +148,8 @@ class Action:
             client.publish(out_topic, str.encode(data))
         else:
             for gw in Rule.output_topics_per_gw[r_id]:
-                gw_client = MQTTClient("pub_output", gw)
+                print(gw)
+                gw_client = MQTTClient("pub_output", str(gw+'.local'))
                 gw_client.connect()
                 gw_client.publish(out_topic, str.encode(data))
                 gw_client.disconnect()
