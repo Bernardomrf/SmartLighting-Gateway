@@ -20,6 +20,7 @@ enable = False
 last_hb = time.time()
 devices_on_control = []
 gw_in_events = {}
+sensors_list = {}
 
 @asyncio.coroutine
 def main():
@@ -30,9 +31,10 @@ def main():
     client.connect()
     client_pub.connect()
     client.subscribe(confs.SUB_TOPIC, qos=1)
-    client.subscribe(confs.HB_TOPIC, qos=1)
+    #client.subscribe(confs.HB_TOPIC, qos=1)
     client_pub.subscribe(confs.IN_TOPICS_TOPIC, qos=1)
     client_pub.subscribe(confs.OUT_TOPICS_TOPIC, qos=1)
+    client_pub.subscribe(confs.HB_TOPIC, qos=1)
 
     loop.create_task(get_message())
     loop.create_task(wait_message())
@@ -58,7 +60,7 @@ def heart_beat():
     while True:
         global enable
         print(gw_in_events)
-        print(Rule.output_topics_per_gw)
+        print(sensors_list)
         if enable:
 
             data = '{"gateway":"'+confs.GATEWAY_NAME+'"}'
@@ -66,16 +68,26 @@ def heart_beat():
             #print(devices_on_control)
             #print(Rule.actions_list.keys())
         if ((time.time() - last_hb) > confs.HB_TIMER):
-            print('GatewayCEP - UP')
-            enable = True
-        else:
             print('GatewayCEP - DOWN')
             enable = False
+        else:
+            print('GatewayCEP - UP')
+            enable = True
         yield from asyncio.sleep(confs.HB_TIMER)
 
 def event_trigger(topic, msg):
     global gw_in_events
     global enable
+
+    ################ SEGUNDO CENARIO ###########
+    if topic.decode("utf-8") == confs.HB_TOPIC:
+        global last_hb
+        print("HB2")
+        last_hb = time.time()
+        return
+
+    if not enable:
+        return
 
     if '/SM/out_events' in topic.decode("utf-8"):
         print(topic)
@@ -103,44 +115,17 @@ def event_trigger(topic, msg):
         Rule.output_topics_per_gw = ujson.loads(msg)
 
 
-def compare_topics(in_topic, rule_topic):
-
-    in_topic = in_topic.split('/')
-    rule_topic = rule_topic.split('/')
-
-    for i, txt in enumerate(rule_topic):
-        try:
-            if txt == 'all':
-                return True
-
-            elif txt != in_topic[i]:
-                return False
-
-        except Exception as e:
-            return True
-
-    return True
-
 def message_arrive(topic, msg):
-    #print(topic)
-    if topic.decode("utf-8") == confs.HB_TOPIC:
-        global last_hb
-        last_hb = time.time()
-        return
+    """if topic.decode("utf-8") == confs.HB_TOPIC:
+                    global last_hb
+                    print("HB1")
+                    last_hb = time.time()
+                    return"""
 
     if not enable:
         global gw_in_events
+        global sensors_list
         #TERCEIRO CENARIO
-        if '/my_device' in topic.decode("utf-8"):
-            ##
-            new_topic = topic.decode("utf-8").replace("/my_device", "")
-            ## PUBLISH IN GATEWAYS
-
-
-
-            return
-
-
 
         if '/SM/out_events' in topic.decode("utf-8"):
             print(topic)
@@ -190,6 +175,16 @@ def message_arrive(topic, msg):
         DeviceRegister.register(client_pub)
         return
 
+    if topic.decode("utf-8") == '/SM/add_device_sensor':
+        #print('adding device')
+        json_dict = ujson.loads(msg)
+        device = list(json_dict.keys())[0]
+        topic = json_dict[device]
+        sensors_list[device] = topic
+        if device not in devices_on_control:
+            devices_on_control.append(device)
+        return
+
     if topic.decode("utf-8") == '/SM/add_device':
         #print('adding device')
         json_dict = ujson.loads(msg)
@@ -207,6 +202,7 @@ def message_arrive(topic, msg):
         device = msg.decode("utf-8")
         try:
             del devices_on_control[devices_on_control.index(device)]
+            del sensors_list[sensors_list.index(device)]
         except Exception as e:
             print('Device not found')
         return
@@ -216,9 +212,52 @@ def message_arrive(topic, msg):
         gc.collect()
         print(gc.mem_alloc())'''
 
+@asyncio.coroutine
+def simulate_in_events():
+
+    while True:
+        if not enable:
+            global sensors_list
+
+            for device, topic in sensors_list.items():
+                if 'motion' in device:
+                    in_topic = topic + '/3302/0/5500/0'
+                    data = '{"event": {"payloadData": {"value": 1, "object_instance": 0, "resource_instance": 0, "object": 3302, "device": "motion125", "resource": 5500}}}'
+
+                elif 'lux' in device:
+                    in_topic = topic + '/3301/0/5700/0'
+                    data = '{"event": {"payloadData": {"value": 6.95, "object_instance": 0, "resource_instance": 0, "object": 3301, "device": "lux38", "resource": 5700}}}'
+
+                send_in_event(in_topic, data)
+                yield from asyncio.sleep(2)
+        yield from asyncio.sleep(0.5)
+    """/SM/in_events/IT2/Floor0/Corredor/0_13_3/3/motion125/3302/0/5500/0
+                b'{"event": {"payloadData": {"value": 1, "object_instance": 0, "resource_instance": 0, "object": 3302, "device": "motion125", "resource": 5500}}}'
+                /SM/in_events/IT2/Floor0/Outro/0_6_2/2/lux38/3301/0/5700/0
+                b'{"event": {"payloadData": {"value": 6.95, "object_instance": 0, "resource_instance": 0, "object": 3301, "device": "lux38", "resource": 5700}}}'"""
 
 
+def send_in_event(topic, data):
+    global gw_in_events
 
+
+def compare_topics(in_topic, rule_topic):
+
+    in_topic = in_topic.split('/')
+    rule_topic = rule_topic.split('/')
+
+    for i, txt in enumerate(rule_topic):
+        try:
+            if txt == '+':
+                return True
+
+            elif txt != in_topic[i]:
+                return False
+
+        except Exception as e:
+            return True
+
+    return True
 
 if __name__ == '__main__':
     loop.create_task(main())

@@ -1,7 +1,7 @@
 
 from umqtt.simple import MQTTClient
 import configs as confs
-
+from rules.rule import Rule
 import uasyncio as asyncio
 import utime as time
 
